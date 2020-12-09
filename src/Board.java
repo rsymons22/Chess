@@ -51,6 +51,10 @@ public class Board {
         }
     }
 
+    public Piece[][] getBoardArray() {
+        return boardArray;
+    }
+
     public void whiteTurn(int row, int column) {
 
     }
