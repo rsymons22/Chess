@@ -8,7 +8,7 @@ public class Chess extends Application{
 
     public void start(Stage primaryStage) {
         
-        Pane pane = new StackPane();
+        Pane pane = new Pane();
 
         Scene scene = new Scene(pane, 480, 480);
         primaryStage.setTitle("Chess");
