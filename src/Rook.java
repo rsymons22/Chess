@@ -4,106 +4,92 @@ import javafx.scene.image.ImageView;
 
 public class Rook extends Piece {
     private Board board;
-    private int oppositeTeamColor;
+    private int teamColor;
 
     public Rook(int teamColor, Board board, int startingRow, int startingColumn, ImageView pieceImage) {
         super(teamColor, board, startingRow, startingColumn, pieceImage);  
 
         this.board = board;
-
-        if(teamColor == Constants.WHITE) {
-            oppositeTeamColor = Constants.BLACK;
-        } else {
-            oppositeTeamColor = Constants.WHITE;
-        }
+        this.teamColor = teamColor;
     }
 
     public ArrayList<RedDot> showMoves()
     {
-        ArrayList<RedDot> rookPossibleMoves = new ArrayList<RedDot>();
+        ArrayList<RedDot> possibleMoves = new ArrayList<RedDot>();
 
         Piece[][] boardArray = board.getBoardArray();
 
         // up
 
-        for(int i = this.getColumn() - 1; i >= 0; i--) {
-            Piece piece = boardArray[i][currentColumn];
+        for(int row = currentRow - 1; row >= 0; row--) {
+                Piece piece = boardArray[row][currentColumn];
 
-            if(piece == null) { // rook sees empty space
-                RedDot dot = new RedDot(i, currentColumn, board);
-                rookPossibleMoves.add(dot);
-            }
-            else if(piece.getTeamColor() == oppositeTeamColor) { // rook sees enemy piece
-                RedDot dot = new RedDot(i, currentColumn, board);
-                rookPossibleMoves.add(dot);
-                break; // break because rook stops when it would capture a piece
-            }
-            else { // rook sees a friendly piece
-                break; // break because rook cannot skip a friendly piece
-            }
+                if(piece == null) { // rook sees empty space
+                    possibleMoves.add(new RedDot(row, currentColumn, board));
+                }
+                else if(piece.getTeamColor() != teamColor) { // rook sees enemy piece
+                    possibleMoves.add(new RedDot(row, currentColumn, board));
+                    break; // break because rook stops when it would capture a piece
+                }
+                else { // rook sees a friendly piece
+                    break; // break because rook cannot skip a friendly piece
+                }
         }
 
         // down
         
-        for(int i = this.getColumn() + 1; i <= 8; i++) {
-            Piece piece = boardArray[i][currentColumn];
+        for(int row = currentRow + 1; row <= 7; row++) {
+            //if(row <= 7) {
+                Piece piece = boardArray[row][currentColumn];
 
-            if(piece == null) { // rook sees empty space
-                RedDot dot = new RedDot(i, currentColumn, board);
-                rookPossibleMoves.add(dot);
-            }
-            else if(piece.getTeamColor() == oppositeTeamColor) { // rook sees enemy piece
-                RedDot dot = new RedDot(i, currentColumn, board);
-                rookPossibleMoves.add(dot);
-                break; // break because rook stops when it captures a piece
-            }
-            else { // rook sees a friendly piece
-                break; // break because rook cannot skip a friendly piece
-            }
+                if(piece == null) { // rook sees empty space
+                    possibleMoves.add(new RedDot(row, currentColumn, board));
+                }
+                else if(piece.getTeamColor() != teamColor) { // rook sees enemy piece
+                    possibleMoves.add(new RedDot(row, currentColumn, board));
+                    break; // break because rook stops when it captures a piece
+                }
+                else { // rook sees a friendly piece
+                    break; // break because rook cannot skip a friendly piece
+                }
+            //}
         }
 
         // right 
-        
-        for(int i = this.getRow() + 1; i <= 8; i++) {
-            Piece piece = boardArray[currentRow][i];
+        for(int column = currentColumn + 1; column <= 7; column++) {
+            //if(row <= 7) {
+                Piece piece = boardArray[currentRow][column];
 
-            if(piece == null) { // rook sees empty space
-                RedDot dot = new RedDot(currentRow, i, board);
-                rookPossibleMoves.add(dot);
-            }
-            else if(piece.getTeamColor() == oppositeTeamColor) { // rook sees enemy piece
-                RedDot dot = new RedDot(currentRow, i, board);
-                rookPossibleMoves.add(dot);
-                break; // break because rook stops when it captures a piece
-            }
-            else { // rook sees a friendly piece
-                break; // break because rook cannot skip a friendly piece
-            }
+                if(piece == null) { // rook sees empty space
+                    possibleMoves.add(new RedDot(currentRow, column, board));
+                }
+                else if(piece.getTeamColor() != teamColor) { // rook sees enemy piece
+                    possibleMoves.add(new RedDot(currentRow, column, board));
+                    break; // break because rook stops when it captures a piece
+                }
+                else { // rook sees a friendly piece
+                    break; // break because rook cannot skip a friendly piece
+                }
+            //}
         }
         
-        // left
+        // Left
         
-        for(int i = this.getRow() - 1; i >= 0; i--) {
-            Piece piece = boardArray[currentRow][i];
+        for(int column = currentColumn - 1; column >= 0; column--) {
+                Piece piece = boardArray[currentRow][column];
 
-            if(piece == null) { // rook sees empty space
-                RedDot dot = new RedDot(currentRow, i, board);
-                rookPossibleMoves.add(dot);
-            }
-            else if(piece.getTeamColor() == oppositeTeamColor) {// rook sees enemy piece
-                RedDot dot = new RedDot(currentRow, i, board);
-                rookPossibleMoves.add(dot);
-                break; // break because rook stops when it captures a piece
-            }
-            else {// rook sees a friendly piece
-                break; // break because rook cannot skip a friendly piece
-            }
+                if(piece == null) { // rook sees empty space
+                    possibleMoves.add(new RedDot(currentRow, column, board));
+                }
+                else if(piece.getTeamColor() != teamColor) {// rook sees enemy piece
+                    possibleMoves.add(new RedDot(currentRow, column, board));
+                    break; // break because rook stops when it captures a piece
+                }
+                else {// rook sees a friendly piece
+                    break; // break because rook cannot skip a friendly piece
+                }
         }
         
-        return rookPossibleMoves;
-    }
-
-    public void move(int row, int column) {
-        changeLocation(row, column);
+        return possibleMoves;
     }
 }

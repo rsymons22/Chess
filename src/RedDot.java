@@ -1,4 +1,5 @@
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 
 public class RedDot {
     private int currentColumn;
@@ -23,13 +24,13 @@ public class RedDot {
         return currentRow;
     }
 
-    public void remove() {
-        board.getPane().getChildren().remove(image);
+    public void remove(Pane pane) {
+        pane.getChildren().remove(image);
     }
 
     public void setLocation() {
-        image.setLayoutX((currentColumn * 60) + 20); // as of 12/8 not sure why + 20, was in og code, probably due to dot being low in png
-        image.setLayoutY((currentRow * 60) + 20);
+        image.setTranslateX((currentColumn * 60) + 20); // + 20 due to the red dot being low
+        image.setTranslateY((currentRow * 60) + 20);
     }
 
     public void printLocation() {

@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 import javafx.scene.image.ImageView;
 
-public class Piece {
+public abstract class Piece {
     protected int currentRow;
     protected int currentColumn;
 
@@ -23,7 +23,6 @@ public class Piece {
         this.board = board;
         this.teamColor = teamColor;
 
-        System.out.println("Creating piece at: " + row + ", " + column);
         pieceImage.setLayoutX(column * 60); // Each board square and piece is 60 pixels long. 
         pieceImage.setLayoutY(row * 60);
         board.getPane().getChildren().add(pieceImage);
@@ -47,19 +46,29 @@ public class Piece {
         return null;
     }
     
-    public void move(int column, int row) {}
+    public void move(int row, int column) {
+        changeLocation(row, column, this);
+    }
     
-    public void changeLocation(int row, int column) {
+    public void changeLocation(int row, int column, Piece piece) {
         pieceImage.setLayoutX(column * 60);
         pieceImage.setLayoutY(row * 60);
+
+        System.out.println("Piece changeLocation, setting piece at: " + currentRow + ", " + currentColumn);
+        board.getBoardArray()[currentRow][currentColumn] = null;
+        board.getBoardArray()[row][column] = piece;
+
         currentRow = row;
         currentColumn = column;
     }
     
     public void removePiece()
     {
+        System.out.println("Removing piece: " + pieceImage + " at " + currentRow + ", " + currentColumn);
         board.getPane().getChildren().remove(pieceImage);
         isCaptured = true;
+        board.getBoardArray()[currentRow][currentColumn] = null;
+
     }
     
     public boolean isCaptured()
@@ -67,18 +76,33 @@ public class Piece {
         return isCaptured;
     }
     
-    public void phasePiece(int column, int row)
+    public void phasePiece(int row, int column)
     {
+        System.out.println("phasing piece at: " + row + ", " + column);
         tempRow = currentRow;
         tempColumn = currentColumn;
         
         currentRow = row;
         currentColumn = column;
+
+        if(row == -1 || column == -1) {
+            board.getBoardArray()[tempRow][tempColumn] = null;
+        } else {
+            board.getBoardArray()[currentRow][currentColumn] = this;
+        }
     }
     
     public void unPhasePiece()
     {
+        
+        if(currentRow != -1 && currentColumn != -1) {
+            board.getBoardArray()[currentRow][currentColumn] = null;
+        }
+
         currentRow = tempRow;
         currentColumn = tempColumn;
+
+        System.out.println("unphasing piece at: " + currentRow + ", " + currentColumn);
+        board.getBoardArray()[currentRow][currentColumn] = this;
     }
 }
