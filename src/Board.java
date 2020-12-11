@@ -64,7 +64,7 @@ public class Board {
         return -1;
     }
 
-    private void printBoardArray() {
+    public void printBoardArray() {
         for(int i = 0; i < 8; i++) {
             System.out.println(Arrays.toString(boardArray[i]));
         }
@@ -75,7 +75,7 @@ public class Board {
     }
 
     private void turn(int row, int column, int teamColor) {
-        System.out.println("turn method called on: " + row + "," + column);
+        //System.out.println("turn method called on: " + row + "," + column);
         int oppositeTeamColor;
 
         if(teamColor == Constants.WHITE) {
@@ -86,14 +86,14 @@ public class Board {
 
         switch(pieceState) {
             case Constants.CLICK_ON_PIECE:
-            System.out.println("Click on piece state");
+            //System.out.println("Click on piece state");
                 pieceClickedOn = boardArray[row][column];
                 System.out.println("Piece clicked on: " + row + ", " + column + ": " + pieceClickedOn);
                 if(pieceClickedOn != null) { // If they click on a piece
                     System.out.println("Clicked on piece");
                     if(pieceClickedOn.getTeamColor() == teamColor) { // If the piece is on the team of whos turn it is
                         System.out.println("Clicked on piece of: " + teamColor);
-                        possibleMoves = pieceClickedOn.showMoves(); 
+                        possibleMoves = pieceClickedOn.findMoves(); 
                         setDotsVisible();
                         if(possibleMoves.isEmpty()) {
                             System.out.println("No possible moves, clearing");
@@ -108,6 +108,17 @@ public class Board {
                 break;
 
             case Constants.RED_DOTS_PLACED:
+
+                Piece king;
+                Piece opposingKing;
+
+                if(teamColor == Constants.WHITE) {
+                    king = pieceArray[15];
+                    opposingKing = pieceArray[31];
+                } else {
+                    king = pieceArray[31];
+                    opposingKing = pieceArray[15];
+                }
                 
                 Piece spotClickedOn = boardArray[row][column];
 
@@ -116,7 +127,8 @@ public class Board {
                     for (int i = 0; i < possibleMoves.size(); i++) {
                         if(row == possibleMoves.get(i).getRow() && column == possibleMoves.get(i).getColumn()) {
                             pieceClickedOn.phasePiece(row, column);
-                            if(isInCheck(teamColor, true, true) && !checkMate) {
+                            printBoardArray();
+                            if(isInCheck(king, true, true, pieceClickedOn) && !checkMate) {
                                 pieceClickedOn.unPhasePiece();
                                 removeRedDots();
                                 possibleMoves.clear();
@@ -135,12 +147,12 @@ public class Board {
                                 } else {
                                     isWhiteTurn = true;
                                 }
-                                isInCheck(oppositeTeamColor, true, true);
-                                if(isCheckMate(oppositeTeamColor))
-                                {
-                                    checkMate = true;
-                                    //update message this team wins checkmate
-                                }
+                                isInCheck(opposingKing, true, true, pieceClickedOn);
+                                // if(isCheckMate(oppositeTeamColor))
+                                // {
+                                //     checkMate = true;
+                                //     //update message this team wins checkmate
+                                // }
                                 break;
                             }
                         }
@@ -149,7 +161,6 @@ public class Board {
 
                     System.out.println("Clicked on same piece");
                     removeRedDots();
-                    repaint();
                     possibleMoves.clear();
                     pieceState = Constants.CLICK_ON_PIECE;
                 } else {
@@ -162,7 +173,7 @@ public class Board {
                                 pieceClickedOn.phasePiece(row, column);
                                 spotClickedOn.phasePiece(-1, -1);
 
-                                if(isInCheck(teamColor, true, true) && !checkMate) {
+                                if(isInCheck(king, true, true, pieceClickedOn) && !checkMate) {
                                     pieceClickedOn.unPhasePiece();
                                     spotClickedOn.unPhasePiece();
                                     removeRedDots();
@@ -184,11 +195,13 @@ public class Board {
                                         isWhiteTurn = true;
                                     }
 
-                                    isInCheck(oppositeTeamColor, true, true);
-                                    if(isCheckMate(oppositeTeamColor)) {
-                                        checkMate = true;
-                                        // update message this team wins check mate
+                                    if(!checkMate) {
+                                        isInCheck(opposingKing, true, true, pieceClickedOn);
                                     }
+                                    // if(isCheckMate(oppositeTeamColor)) {
+                                    //     checkMate = true;
+                                    //     // update message this team wins check mate
+                                    // }
                                     break;
                                 }
                             }
@@ -197,7 +210,9 @@ public class Board {
                 }
                 break;
         }
+        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------------");
         printBoardArray();
+        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------------");
     }
 
 
@@ -207,12 +222,145 @@ public class Board {
 
     }
 
-    private boolean isInCheck(int kingColor, boolean updateMessage, boolean runCheckMate) {
+    // private boolean isInCheck(int kingColor, boolean updateMessage, boolean runCheckMate) {
+
+    //     //System.out.println("Calling is In Check (0 = white): " + kingColor);
+
+    //     for(int i = 0; i < 32; i++) { // loop through pieceArray
+
+    //         if(!pieceArray[i].isCaptured() && (!pieceArray[i].isPhased())) { // check if the piece is captured or is phased
+    //             ArrayList<RedDot> arraylist = pieceArray[i].findMoves(); // set the array to the possible moves of the piece
+
+    //             for(int j = 0; j < arraylist.size(); j++) { // loop through the array of the possible moves
+
+    //                 if(arraylist.get(j).getColumn() == getKingColumn(kingColor) && // if an imaginary red dot is on the opposite king
+    //                   (arraylist.get(j).getRow() == getKingRow(kingColor)))
+    //                 {
+    //                     System.out.println("Check");
+
+    //                     if(runCheckMate && isCheckMate(kingColor)) {
+    //                         checkMate = true;
+    //                     }
+                        
+    //                     // if(updateMessage) {
+    //                     //     if(kingColor.equals("white"))
+    //                     //     {
+    //                     //         updateMessage("WTC");
+    //                     //     }
+    //                     //     else
+    //                     //     {
+    //                     //         updateMessage("BTC");
+    //                     //     }
+    //                     // }
+    //                     return true;
+    //                 }
+    //             }
+    //             removeRedDots();
+    //         }
+    //     }
+
+    //     return false;
+    // }
+
+    private boolean isInCheck(Piece piece, boolean updateMessage, boolean runCheckMate, Piece checkingPiece) {
+
+        //System.out.println("Calling is In Check (0 = white): " + kingColor);
+
+        for(int i = 0; i < 32; i++) { // loop through pieceArray
+
+            if(!pieceArray[i].isCaptured() && (!pieceArray[i].isPhased())) { // check if the piece is captured or is phased
+                ArrayList<RedDot> arraylist = pieceArray[i].findMoves(); // set the array to the possible moves of the piece
+
+                for(int j = 0; j < arraylist.size(); j++) { // loop through the array of the possible moves
+
+                    if(arraylist.get(j).getColumn() == piece.getColumn() && // if an imaginary red dot is on the opposite king
+                      (arraylist.get(j).getRow() == piece.getRow()))
+                    {
+                        if(piece.getClass().getName().equals("King")) {
+
+                            System.out.println("Check");
+
+                            if(runCheckMate && isCheckMate(piece, checkingPiece)) {
+                                checkMate = true;
+                            }
+                        }
+                        
+                        // if(updateMessage) {
+                        //     if(kingColor.equals("white"))
+                        //     {
+                        //         updateMessage("WTC");
+                        //     }
+                        //     else
+                        //     {
+                        //         updateMessage("BTC");
+                        //     }
+                        // }
+                        return true;
+                    }
+                }
+                removeRedDots();
+            }
+        }
+
         return false;
     }
 
-    private boolean isCheckMate(int kingColor) {
-        return false;
+    private boolean isCheckMate(Piece king, Piece checkingPiece) {
+        System.out.println("entering isCheckMate");
+
+        if(isInCheck(checkingPiece, false, false, checkingPiece)) {
+            return false;
+        }
+
+
+        int startingPoint = 0;
+
+        if(king.getTeamColor() == Constants.WHITE)
+        {
+            startingPoint = 0;
+        }
+        else
+        {
+            startingPoint = 16;
+        }
+
+        for(int i = startingPoint; i < (startingPoint + 15); i++)
+        {
+            Piece piece = pieceArray[i];
+            ArrayList<RedDot> arraylist = piece.findMoves();
+            //System.out.println(kingColor + " " + pieceArray[i] + "piece being checked at i: " + i);
+            for(int k = 0; k < arraylist.size(); k++)
+            {
+                piece.phasePiece(arraylist.get(k).getRow(), arraylist.get(k).getColumn());
+                //System.out.println("going into isInCheck");
+                if(!isInCheck(king, false, false, checkingPiece))
+                {
+                    piece.unPhasePiece();
+                    return false;
+                }
+                piece.unPhasePiece();
+            }
+        }
+
+        System.out.println("Checkmate");
+        return true;
+    }
+
+    private int getKingColumn(int kingColor) {
+        if(kingColor == Constants.WHITE) {
+            return pieceArray[15].getColumn();
+        } else {
+            return pieceArray[31].getColumn();
+        }
+    }
+
+    private int getKingRow(int kingColor)
+    {
+        if(kingColor == Constants.WHITE) {
+            return pieceArray[15].getRow();
+        } else {
+            return pieceArray[31].getRow();
+        }
     }
 
     public Pane getPane() {
@@ -279,7 +427,7 @@ public class Board {
         {
             possibleMoves.get(i).remove(pane);
         }
-        pane.requestLayout();
+        repaint();
         
     }
 
@@ -300,7 +448,7 @@ public class Board {
     }
 
     public void repaint() {
-        scene.getWindow().setOpacity(0); // This must be done to reset or "repaint" the javafx scene so the red dot's removal gets updated.
+        scene.getWindow().setOpacity(0.999); // This must be done to reset or "repaint" the javafx scene so the red dot's removal gets updated.
         scene.getWindow().setOpacity(1); // This simply updates the frame so it checks everything again, this is due to a bug in JavaFX. 
     }
 

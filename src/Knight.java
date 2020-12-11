@@ -3,18 +3,12 @@ import java.util.ArrayList;
 import javafx.scene.image.ImageView;
 
 public class Knight extends Piece {
-    private Board board;
-    private int teamColor;
-    private ArrayList<RedDot> possibleMoves;
 
     public Knight(int teamColor, Board board, int startingRow, int startingColumn, ImageView pieceImage) {
         super(teamColor, board, startingRow, startingColumn, pieceImage);  
-
-        this.board = board;
-        this.teamColor = teamColor;
     }
 
-    public ArrayList<RedDot> showMoves()
+    public ArrayList<RedDot> findMoves()
     {
         possibleMoves = new ArrayList<RedDot>();
 

@@ -17,7 +17,7 @@ public class Chess extends Application{
         primaryStage.setResizable(false);
         primaryStage.show();
 
-        Board board = new Board(pane, scene, primaryStage);
+        new Board(pane, scene, primaryStage);
     }
 
     public static void main(String[] args) throws Exception {

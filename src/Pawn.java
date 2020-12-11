@@ -4,87 +4,88 @@ import javafx.scene.image.ImageView;
 
 public class Pawn extends Piece {
     private boolean canSkip;
-    private Board board;
-    private int teamColor;
 
     public Pawn(int teamColor, Board board, int startingRow, int startingColumn, ImageView pieceImage) {
         super(teamColor, board, startingRow, startingColumn, pieceImage);  
-
-        this.board = board;
         canSkip = true;
-        this.teamColor = teamColor;
     }
 
-    public ArrayList<RedDot> showMoves() {
-        ArrayList<RedDot> possibleMoves = new ArrayList<RedDot>();
+    public ArrayList<RedDot> findMoves() {
+        possibleMoves = new ArrayList<RedDot>();
 
         Piece[][] boardArray = board.getBoardArray();
 
         if(teamColor == Constants.BLACK) {
 
-            if(canSkip == true) {
+            if(canSkip) {
 
-                if((boardArray[currentRow + 2][currentColumn] == null) && (boardArray[currentRow + 1][currentColumn] == null)) { // no piece at the space just 2 before the black pawn
-                    RedDot dot2 = new RedDot(currentRow + 2, currentColumn, board);
-                    possibleMoves.add(dot2);
+                if(((currentRow + 2) <= 7) &&
+                   (boardArray[currentRow + 2][currentColumn] == null) && 
+                   (boardArray[currentRow + 1][currentColumn] == null)) 
+                { // no piece at the space just 2 before the black pawn
+                    possibleMoves.add(new RedDot(currentRow + 2, currentColumn, board));
                 }
             }
 
-            if(boardArray[currentRow + 1][currentColumn] == null) {// no piece at the space just one before the black pawn
-                System.out.println("Found position at: " + (currentRow + 1) + ", " + currentColumn);
-                RedDot dot1 = new RedDot(currentRow + 1, currentColumn, board);
-                possibleMoves.add(dot1);
+            if(((currentRow + 1) <= 7) &&
+               (boardArray[currentRow + 1][currentColumn] == null)) 
+            {// no piece at the space just one before the black pawn
+                possibleMoves.add(new RedDot(currentRow + 1, currentColumn, board));
             }
 
-            if(currentColumn != 0 &&
-                boardArray[currentRow + 1][currentColumn - 1] != null && 
-            (boardArray[currentRow + 1][currentColumn - 1].getTeamColor() == Constants.WHITE))
+            if(((currentRow + 1) <= 7) && 
+               (currentColumn - 1) >= 0 &&
+               (boardArray[currentRow + 1][currentColumn - 1] != null) && 
+               (boardArray[currentRow + 1][currentColumn - 1].getTeamColor() == Constants.WHITE))
             {
-                System.out.println("Found enemy piece to attack: " + (currentRow + 1) + ", " + (currentColumn - 1));
+                //System.out.println("Found enemy piece to attack: " + (currentRow + 1) + ", " + (currentColumn - 1));
                 RedDot dot3 = new RedDot(currentRow + 1, currentColumn - 1, board);
                 possibleMoves.add(dot3);
             }
 
-            if(currentColumn != 7 &&
+            if((currentRow + 1) <= 7 && (currentColumn + 1) <= 7 &&
                 boardArray[currentRow + 1][currentColumn + 1] != null && 
             (boardArray[currentRow + 1][currentColumn + 1].getTeamColor() == Constants.WHITE))
             {
-                System.out.println("Found enemy piece to attack: " + (currentRow + 1) + ", " + (currentColumn + 1));
-                RedDot dot4 = new RedDot(currentColumn + 1, currentRow + 1, board);
+                //System.out.println("Found enemy piece to attack: " + (currentRow + 1) + ", " + (currentColumn + 1));
+                RedDot dot4 = new RedDot(currentRow + 1, currentColumn + 1, board);
                 possibleMoves.add(dot4);
             }
         }
         else
         {
 
-            if(canSkip == true) {
+            if(canSkip) {
 
-                if((boardArray[currentRow - 2][currentColumn] == null) && (boardArray[currentRow - 1][currentColumn] == null)) { // no piece at the space just 2 before the black pawn
+                //System.out.println("Checking: " + (currentRow - 2) + ", " + currentColumn + " and " + (currentRow - 1) + ", " + currentColumn);
+                if(((currentRow - 2) >= 0 &&
+                    boardArray[currentRow - 2][currentColumn] == null) && (boardArray[currentRow - 1][currentColumn] == null)) { // no piece at the space just 2 before the black pawn
                     RedDot dot2 = new RedDot(currentRow - 2, currentColumn, board);
                     possibleMoves.add(dot2);
                 }
             }
 
-            if(boardArray[currentRow - 1][currentColumn] == null) {// no piece at the space just one before the black pawn
-                System.out.println("Found position at: " + (currentRow - 1) + ", " + currentColumn);
+            if((currentRow - 1) >= 0 &&
+                boardArray[currentRow - 1][currentColumn] == null) {// no piece at the space just one before the black pawn
+                //System.out.println("Found position at: " + (currentRow - 1) + ", " + currentColumn);
                 RedDot dot1 = new RedDot(currentRow - 1, currentColumn, board);
                 possibleMoves.add(dot1);
             }
 
-            if(currentColumn != 7 &&
+            if((currentRow - 1) >= 0 && (currentColumn + 1) <= 7 &&
               (boardArray[currentRow - 1][currentColumn + 1] != null) && 
               (boardArray[currentRow - 1][currentColumn + 1].getTeamColor() == Constants.BLACK))
             {
-                System.out.println("Found enemy piece to attack: " + (currentRow - 1) + ", " + (currentColumn + 1));
+                //System.out.println("Found enemy piece to attack: " + (currentRow - 1) + ", " + (currentColumn + 1));
                 RedDot dot3 = new RedDot(currentRow - 1, currentColumn + 1, board);
                 possibleMoves.add(dot3);
             }
 
-            if(currentColumn != 0 &&
+            if((currentRow - 1) >= 0 && (currentColumn - 1) >= 0 &&
               (boardArray[currentRow - 1][currentColumn - 1] != null) && 
               (boardArray[currentRow - 1][currentColumn - 1].getTeamColor() == Constants.BLACK))
             {
-                System.out.println("Found enemy piece to attack: " + (currentRow - 1) + ", " + (currentColumn - 1));
+                //System.out.println("Found enemy piece to attack: " + (currentRow - 1) + ", " + (currentColumn - 1));
                 RedDot dot4 = new RedDot(currentRow - 1, currentColumn - 1, board);
                 possibleMoves.add(dot4);
             }

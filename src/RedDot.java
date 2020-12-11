@@ -4,13 +4,12 @@ import javafx.scene.layout.Pane;
 public class RedDot {
     private int currentColumn;
     private int currentRow;
-
     private Board board;
+
     private ImageView image;
 
     public RedDot(int row, int column, Board board) {
         image = Board.initImage("redDot");
-        board.getPane().getChildren().add(image);
         currentRow = row;
         currentColumn = column;
         this.board = board;
@@ -29,7 +28,10 @@ public class RedDot {
     }
 
     public void setLocation() {
-        image.setTranslateX((currentColumn * 60) + 20); // + 20 due to the red dot being low
+        board.getPane().getChildren().add(image);
+        System.out.print("Creating red dot, ");
+        printLocation();
+        image.setTranslateX((currentColumn * 60) + 20); // + 20 due to the red dot being low in png
         image.setTranslateY((currentRow * 60) + 20);
     }
 

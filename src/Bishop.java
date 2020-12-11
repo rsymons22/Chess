@@ -3,19 +3,14 @@ import java.util.ArrayList;
 import javafx.scene.image.ImageView;
 
 public class Bishop extends Piece {
-    private Board board;
-    private int teamColor;
 
     public Bishop(int teamColor, Board board, int startingRow, int startingColumn, ImageView pieceImage) {
         super(teamColor, board, startingRow, startingColumn, pieceImage);  
-
-        this.board = board;
-        this.teamColor = teamColor;
     }
 
-    public ArrayList<RedDot> showMoves()
+    public ArrayList<RedDot> findMoves()
     {
-        ArrayList<RedDot> possibleMoves = new ArrayList<RedDot>();
+        possibleMoves = new ArrayList<RedDot>();
 
         int columnUpLeft = this.getColumn() - 1;
         int columnDownRight = this.getColumn() + 1;
