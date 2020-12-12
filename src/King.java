@@ -14,36 +14,36 @@ public class King extends Piece {
 
         Piece[][] boardArray = board.getBoardArray();
         
-        if(currentRow - 1 >= 0 && currentColumn + 1 <= 7) {
-            kingMove(currentRow - 1, currentColumn + 1, boardArray);
+        if(getCurrentRow() - 1 >= 0 && getCurrentColumn() + 1 <= 7) {
+            kingMove(getCurrentRow() - 1, getCurrentColumn() + 1, boardArray);
         }
         
-        if(currentColumn + 1 <= 7) {
-            kingMove(currentRow, currentColumn + 1, boardArray);
+        if(getCurrentColumn() + 1 <= 7) {
+            kingMove(getCurrentRow(), getCurrentColumn() + 1, boardArray);
         }
         
-        if(currentRow + 1 <= 7 && currentColumn + 1 <= 7) {
-            kingMove(currentRow + 1, currentColumn + 1, boardArray);
+        if(getCurrentRow() + 1 <= 7 && getCurrentColumn() + 1 <= 7) {
+            kingMove(getCurrentRow() + 1, getCurrentColumn() + 1, boardArray);
         }
         
-        if(currentRow + 1 <= 7) {
-            kingMove(currentRow + 1, currentColumn, boardArray);
+        if(getCurrentRow() + 1 <= 7) {
+            kingMove(getCurrentRow() + 1, getCurrentColumn(), boardArray);
         }
         
-        if(currentRow + 1 <= 7 && currentColumn - 1 >= 0) {
-            kingMove(currentRow + 1, currentColumn - 1, boardArray);
+        if(getCurrentRow() + 1 <= 7 && getCurrentColumn() - 1 >= 0) {
+            kingMove(getCurrentRow() + 1, getCurrentColumn() - 1, boardArray);
         }
         
-        if(currentColumn - 1 >= 0) {
-            kingMove(currentRow, currentColumn - 1, boardArray);
+        if(getCurrentColumn() - 1 >= 0) {
+            kingMove(getCurrentRow(), getCurrentColumn() - 1, boardArray);
         }
         
-        if(currentRow - 1 >= 0 && currentColumn - 1 >= 0) {
-            kingMove(currentRow - 1, currentColumn - 1, boardArray);
+        if(getCurrentRow() - 1 >= 0 && getCurrentColumn() - 1 >= 0) {
+            kingMove(getCurrentRow() - 1, getCurrentColumn() - 1, boardArray);
         }
         
-        if(currentRow - 1 >= 0) {
-            kingMove(currentRow - 1, currentColumn, boardArray);
+        if(getCurrentRow() - 1 >= 0) {
+            kingMove(getCurrentRow() - 1, getCurrentColumn(), boardArray);
         }
         
         return possibleMoves;

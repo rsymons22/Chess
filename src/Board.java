@@ -54,10 +54,10 @@ public class Board {
             if(e.getY() <= 480) {
                 if(!checkMate) {
                     if(isWhiteTurn) {
-                        System.out.println("white turn, piece state: " + pieceState);
+                        //System.out.println("white turn, piece state: " + pieceState);
                         turn(convertToRC((int)(e.getY())), convertToRC((int)(e.getX())), Constants.WHITE);
                     } else {
-                        System.out.println("black turn, piece state: " + pieceState);
+                        //System.out.println("black turn, piece state: " + pieceState);
                         turn(convertToRC((int)(e.getY())), convertToRC((int)(e.getX())), Constants.BLACK);
                     }
                 }
@@ -103,19 +103,19 @@ public class Board {
             case Constants.CLICK_ON_PIECE:
             //System.out.println("Click on piece state");
                 pieceClickedOn = boardArray[row][column];
-                System.out.println("Piece clicked on: " + row + ", " + column + ": " + pieceClickedOn);
+                //System.out.println("Piece clicked on: " + row + ", " + column + ": " + pieceClickedOn);
                 if(pieceClickedOn != null) { // If they click on a piece
-                    System.out.println("Clicked on piece");
+                    //System.out.println("Clicked on piece");
                     if(pieceClickedOn.getTeamColor() == teamColor) { // If the piece is on the team of whos turn it is
-                        System.out.println("Clicked on piece of: " + teamColor);
+                        //System.out.println("Clicked on piece of: " + teamColor);
                         possibleMoves = pieceClickedOn.findMoves(); 
                         setDotsVisible();
                         if(possibleMoves.isEmpty()) {
-                            System.out.println("No possible moves, clearing");
+                            //System.out.println("No possible moves, clearing");
                             removeRedDots();
                             possibleMoves.clear();
                         } else {
-                            System.out.println("Setting piece state to red dots placed");
+                            //System.out.println("Setting piece state to red dots placed");
                             pieceState = Constants.RED_DOTS_PLACED;
                         }
                     }
@@ -145,7 +145,7 @@ public class Board {
                            !checkMate) 
                         {
                             pieceClickedOn.phasePiece(row, column);
-                            printBoardArray();
+                            //printBoardArray();
                             //System.out.println("Calling is incheck first time case: RED DOTS PLACED and spot clicked on is null");
                             if(isInCheck(king, true)) {
                                 pieceClickedOn.unPhasePiece();
@@ -177,7 +177,7 @@ public class Board {
                     }
                 } else if(spotClickedOn == pieceClickedOn) {
 
-                    System.out.println("Clicked on same piece");
+                    //System.out.println("Clicked on same piece");
                     removeRedDots();
                     possibleMoves.clear();
                     pieceState = Constants.CLICK_ON_PIECE;
@@ -193,6 +193,7 @@ public class Board {
 
                                 
                                 ///spotClickedOn.phasePiece(-1, -1);
+                                //System.out.println("Phasing to-be captured piece: " + spotClickedOn + "to: " + spotClickedOn.getRow() + ", " + spotClickedOn.getColumn());
                                 pieceClickedOn.phasePiece(row, column);
                                 
 
@@ -231,9 +232,7 @@ public class Board {
                 }
                 break;
         }
-        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------------");
-        printBoardArray();
-        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------------");
+        
     }
 
 
@@ -254,12 +253,12 @@ public class Board {
 
                 for(int j = 0; j < moves.size(); j++) { // loop through the array of the possible moves
 
-                    if(moves.get(j).getColumn() == piece.getColumn() && // if an imaginary red dot is on the opposite king
-                      (moves.get(j).getRow() == piece.getRow()) &&
+                    if(moves.get(j).getColumn() == piece.getCurrentColumn() && // if an imaginary red dot is on the opposite king
+                      (moves.get(j).getRow() == piece.getCurrentRow()) &&
                        pieceArray[i].getTeamColor() != (piece.getTeamColor()))
                     {
 
-                            System.out.println("Check by: " + pieceArray[i] + " at " + pieceArray[i].getRow() + ", " + pieceArray[i].getColumn() + " Has a move at " + moves.get(j).getRow() + ", " + moves.get(j).getColumn());
+                            System.out.println("Check by: " + pieceArray[i] + " at " + pieceArray[i].getCurrentRow() + ", " + pieceArray[i].getCurrentColumn() + " Has a move at " + moves.get(j).getRow() + ", " + moves.get(j).getColumn());
                             // System.out.println("Piece " + pieceArray[i] + " has moves at: ");
                             // for(RedDot move: moves) {
                             //     System.out.print("(" + move.getRow() + ", " + move.getColumn() + ")");
@@ -304,6 +303,7 @@ public class Board {
 
         for(int i = startingPoint; i < (startingPoint + 15); i++) // Loops through all pieces on the team whose king is in check
         {
+            if(!pieceArray[i].isCaptured()) {
             Piece piece = pieceArray[i];
             ArrayList<RedDot> moves = piece.findMoves();
             //System.out.println(kingColor + " " + pieceArray[i] + "piece being checked at i: " + i);
@@ -317,6 +317,7 @@ public class Board {
                     return false;
                 }
                 piece.unPhasePiece();
+            }
             }
         }
 
@@ -385,7 +386,7 @@ public class Board {
 
     public void setDotsVisible()
     {
-        System.out.println("Setting dots visible");
+        //System.out.println("Setting dots visible");
         for(int i = 0; i < possibleMoves.size(); i++)
         {
             possibleMoves.get(i).setLocation();

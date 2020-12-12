@@ -14,36 +14,36 @@ public class Knight extends Piece {
 
         Piece boardArray[][] = board.getBoardArray();
 
-        if(currentRow - 2 >= 0 && currentColumn + 1 <= 7) {
-            knightMove(currentRow - 2, currentColumn + 1, boardArray);
+        if(getCurrentRow() - 2 >= 0 && getCurrentColumn() + 1 <= 7) {
+            knightMove(getCurrentRow() - 2, getCurrentColumn() + 1, boardArray);
         }
 
-        if(currentRow - 1 >= 0 && currentColumn + 2 <= 7) {
-            knightMove(currentRow - 1, currentColumn + 2, boardArray);
+        if(getCurrentRow() - 1 >= 0 && getCurrentColumn() + 2 <= 7) {
+            knightMove(getCurrentRow() - 1, getCurrentColumn() + 2, boardArray);
         }
 
-        if(currentRow + 1 <= 7 && currentColumn + 2 <= 7) {
-            knightMove(currentRow + 1, currentColumn + 2, boardArray);
+        if(getCurrentRow() + 1 <= 7 && getCurrentColumn() + 2 <= 7) {
+            knightMove(getCurrentRow() + 1, getCurrentColumn() + 2, boardArray);
         }
 
-        if(currentRow + 2 <= 7 && currentColumn + 1 <= 7) {
-            knightMove(currentRow + 2, currentColumn + 1, boardArray);
+        if(getCurrentRow() + 2 <= 7 && getCurrentColumn() + 1 <= 7) {
+            knightMove(getCurrentRow() + 2, getCurrentColumn() + 1, boardArray);
         }
 
-        if(currentRow + 2 <= 7 && currentColumn - 1 >= 0) {
-            knightMove(currentRow + 2, currentColumn - 1, boardArray);
+        if(getCurrentRow() + 2 <= 7 && getCurrentColumn() - 1 >= 0) {
+            knightMove(getCurrentRow() + 2, getCurrentColumn() - 1, boardArray);
         }
 
-        if(currentRow + 1 <= 7 && currentColumn - 2 >= 0) {
-            knightMove(currentRow + 1, currentColumn - 2, boardArray);
+        if(getCurrentRow() + 1 <= 7 && getCurrentColumn() - 2 >= 0) {
+            knightMove(getCurrentRow() + 1, getCurrentColumn() - 2, boardArray);
         }
 
-        if(currentRow - 1 >= 0 && currentColumn - 2 >= 0) {
-            knightMove(currentRow - 1, currentColumn - 2, boardArray);
+        if(getCurrentRow() - 1 >= 0 && getCurrentColumn() - 2 >= 0) {
+            knightMove(getCurrentRow() - 1, getCurrentColumn() - 2, boardArray);
         }
 
-        if(currentRow - 2 >= 0 && currentColumn - 1 >= 0) {
-            knightMove(currentRow - 2, currentColumn - 1, boardArray);
+        if(getCurrentRow() - 2 >= 0 && getCurrentColumn() - 1 >= 0) {
+            knightMove(getCurrentRow() - 2, getCurrentColumn() - 1, boardArray);
         }
 
         return possibleMoves;

@@ -12,15 +12,15 @@ public class Bishop extends Piece {
     {
         possibleMoves = new ArrayList<RedDot>();
 
-        int columnUpLeft = this.getColumn() - 1;
-        int columnDownRight = this.getColumn() + 1;
-        int rowUpRight = this.getRow() - 1;
-        int rowDownLeft = this.getRow() + 1;
+        int columnUpLeft = getCurrentColumn() - 1;
+        int columnDownRight = getCurrentColumn() + 1;
+        int rowUpRight = getCurrentRow() - 1;
+        int rowDownLeft = getCurrentRow() + 1;
 
         Piece[][] boardArray = board.getBoardArray();
 
         // up left
-        for(int row = currentRow - 1; row >= 0; row--) {
+        for(int row = getCurrentRow() - 1; row >= 0; row--) {
             if(columnUpLeft >= 0)
             if(boardArray[row][columnUpLeft] == null) // bishop sees empty space
             {
@@ -43,7 +43,7 @@ public class Bishop extends Piece {
         // down right
 
         
-        for(int row = currentRow + 1; row <= 7; row++)
+        for(int row = getCurrentRow() + 1; row <= 7; row++)
         {
             if(columnDownRight <= 7)
             if(boardArray[row][columnDownRight] == null) // bishop sees empty space
@@ -65,7 +65,7 @@ public class Bishop extends Piece {
         }
 
         // up right
-        for(int column = currentColumn - 1; column >= 0; column--) 
+        for(int column = getCurrentColumn() - 1; column >= 0; column--) 
         {
             if(rowDownLeft <= 7)
             if(boardArray[rowDownLeft][column] == null) 
@@ -88,7 +88,7 @@ public class Bishop extends Piece {
 
         // down left
 
-        for(int column = currentColumn + 1; column <= 7; column++) 
+        for(int column = getCurrentColumn() + 1; column <= 7; column++) 
         {
             if(rowUpRight >= 0)
             if(boardArray[rowUpRight][column] == null) 

@@ -29,8 +29,8 @@ public class RedDot {
 
     public void setLocation() {
         board.getPane().getChildren().add(image);
-        System.out.print("Creating red dot, ");
-        printLocation();
+        //System.out.print("Creating red dot, ");
+        //printLocation();
         image.setTranslateX((currentColumn * 60) + 20); // + 20 due to the red dot being low in png
         image.setTranslateY((currentRow * 60) + 20);
     }

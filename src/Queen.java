@@ -16,14 +16,14 @@ public class Queen extends Piece {
 
         // up
 
-        for(int row = currentRow - 1; row >= 0; row--) {
-                Piece piece = boardArray[row][currentColumn];
+        for(int row = getCurrentRow() - 1; row >= 0; row--) {
+                Piece piece = boardArray[row][getCurrentColumn()];
 
                 if(piece == null) { // rook sees empty space
-                    possibleMoves.add(new RedDot(row, currentColumn, board));
+                    possibleMoves.add(new RedDot(row, getCurrentColumn(), board));
                 }
                 else if(piece.getTeamColor() != teamColor) { // rook sees enemy piece
-                    possibleMoves.add(new RedDot(row, currentColumn, board));
+                    possibleMoves.add(new RedDot(row, getCurrentColumn(), board));
                     break; // break because rook stops when it would capture a piece
                 }
                 else { // rook sees a friendly piece
@@ -33,15 +33,15 @@ public class Queen extends Piece {
 
         // down
         
-        for(int row = currentRow + 1; row <= 7; row++) {
+        for(int row = getCurrentRow() + 1; row <= 7; row++) {
             //if(row <= 7) {
-                Piece piece = boardArray[row][currentColumn];
+                Piece piece = boardArray[row][getCurrentColumn()];
 
                 if(piece == null) { // rook sees empty space
-                    possibleMoves.add(new RedDot(row, currentColumn, board));
+                    possibleMoves.add(new RedDot(row, getCurrentColumn(), board));
                 }
                 else if(piece.getTeamColor() != teamColor) { // rook sees enemy piece
-                    possibleMoves.add(new RedDot(row, currentColumn, board));
+                    possibleMoves.add(new RedDot(row, getCurrentColumn(), board));
                     break; // break because rook stops when it captures a piece
                 }
                 else { // rook sees a friendly piece
@@ -51,15 +51,15 @@ public class Queen extends Piece {
         }
 
         // right 
-        for(int column = currentColumn + 1; column <= 7; column++) {
+        for(int column = getCurrentColumn() + 1; column <= 7; column++) {
             //if(row <= 7) {
-                Piece piece = boardArray[currentRow][column];
+                Piece piece = boardArray[getCurrentRow()][column];
 
                 if(piece == null) { // rook sees empty space
-                    possibleMoves.add(new RedDot(currentRow, column, board));
+                    possibleMoves.add(new RedDot(getCurrentRow(), column, board));
                 }
                 else if(piece.getTeamColor() != teamColor) { // rook sees enemy piece
-                    possibleMoves.add(new RedDot(currentRow, column, board));
+                    possibleMoves.add(new RedDot(getCurrentRow(), column, board));
                     break; // break because rook stops when it captures a piece
                 }
                 else { // rook sees a friendly piece
@@ -70,14 +70,14 @@ public class Queen extends Piece {
         
         // Left
         
-        for(int column = currentColumn - 1; column >= 0; column--) {
-                Piece piece = boardArray[currentRow][column];
+        for(int column = getCurrentColumn() - 1; column >= 0; column--) {
+                Piece piece = boardArray[getCurrentRow()][column];
 
                 if(piece == null) { // rook sees empty space
-                    possibleMoves.add(new RedDot(currentRow, column, board));
+                    possibleMoves.add(new RedDot(getCurrentRow(), column, board));
                 }
                 else if(piece.getTeamColor() != teamColor) {// rook sees enemy piece
-                    possibleMoves.add(new RedDot(currentRow, column, board));
+                    possibleMoves.add(new RedDot(getCurrentRow(), column, board));
                     break; // break because rook stops when it captures a piece
                 }
                 else {// rook sees a friendly piece
@@ -85,13 +85,13 @@ public class Queen extends Piece {
                 }
         }
 
-        int columnUpLeft = this.getColumn() - 1;
-        int columnDownRight = this.getColumn() + 1;
-        int rowUpRight = this.getRow() - 1;
-        int rowDownLeft = this.getRow() + 1;
+        int columnUpLeft = getCurrentColumn() - 1;
+        int columnDownRight = getCurrentColumn() + 1;
+        int rowUpRight = getCurrentRow() - 1;
+        int rowDownLeft = getCurrentRow() + 1;
 
         // up left
-        for(int row = currentRow - 1; row >= 0; row--) {
+        for(int row = getCurrentRow() - 1; row >= 0; row--) {
             if(columnUpLeft >= 0)
             if(boardArray[row][columnUpLeft] == null) // bishop sees empty space
             {
@@ -114,7 +114,7 @@ public class Queen extends Piece {
         // down right
 
         
-        for(int row = currentRow + 1; row <= 7; row++)
+        for(int row = getCurrentRow() + 1; row <= 7; row++)
         {
             if(columnDownRight <= 7)
             if(boardArray[row][columnDownRight] == null) // bishop sees empty space
@@ -136,7 +136,7 @@ public class Queen extends Piece {
         }
 
         // up right
-        for(int column = currentColumn - 1; column >= 0; column--) 
+        for(int column = getCurrentColumn() - 1; column >= 0; column--) 
         {
             if(rowDownLeft <= 7)
             if(boardArray[rowDownLeft][column] == null) 
@@ -159,7 +159,7 @@ public class Queen extends Piece {
 
         // down left
 
-        for(int column = currentColumn + 1; column <= 7; column++) 
+        for(int column = getCurrentColumn() + 1; column <= 7; column++) 
         {
             if(rowUpRight >= 0)
             if(boardArray[rowUpRight][column] == null) 
