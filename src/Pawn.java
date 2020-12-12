@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 
+import javafx.animation.PathTransition;
 import javafx.scene.image.ImageView;
+import javafx.scene.shape.Line;
+import javafx.util.Duration;
 
 public class Pawn extends Piece {
     private boolean canSkip;
@@ -96,7 +99,7 @@ public class Pawn extends Piece {
 
     public void move(int row, int column) 
     {
-        changeLocation(row, column, this);
+        super.move(row, column);
         canSkip = false;
         
         if(getRow() == 0 && teamColor == Constants.WHITE)

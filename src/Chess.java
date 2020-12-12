@@ -23,7 +23,7 @@ public class Chess extends Application{
 
         pane.setBottom(textField);
 
-        Scene scene = new Scene(pane, 480, 520);
+        Scene scene = new Scene(pane, 480, 510);
         primaryStage.setTitle("Chess");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);

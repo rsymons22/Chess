@@ -172,12 +172,6 @@ public class Board {
                                 if(isInCheck(opposingKing, true)) {
                                     isCheckMate(opposingKing);
                                 };
-                                // if(isCheckMate(oppositeTeamColor))
-                                // {
-                                //     checkMate = true;
-                                //     //update message this team wins checkmate
-                                // }
-                                break;
                             }
                         }
                     }
@@ -193,24 +187,29 @@ public class Board {
 
                         for (int i = 0; i < possibleMoves.size(); i++) {
 
-                            if(row == possibleMoves.get(i).getRow() && column == possibleMoves.get(i).getColumn()) {
-                                pieceClickedOn.phasePiece(row, column);
-                                spotClickedOn.phasePiece(-1, -1);
+                            if(row == possibleMoves.get(i).getRow() && 
+                               column == possibleMoves.get(i).getColumn() &&
+                               !checkMate) {
 
-                                if(isInCheck(king, true) && !checkMate) {
+                                
+                                ///spotClickedOn.phasePiece(-1, -1);
+                                pieceClickedOn.phasePiece(row, column);
+                                
+
+                                if(isInCheck(king, true)) {
                                     pieceClickedOn.unPhasePiece();
-                                    spotClickedOn.unPhasePiece();
+                                    //spotClickedOn.unPhasePiece();
                                     removeRedDots();
                                     possibleMoves.clear();
                                     pieceState = Constants.CLICK_ON_PIECE;
                                 } else {
-
                                     pieceClickedOn.unPhasePiece();
-                                    spotClickedOn.unPhasePiece();
+                                    //spotClickedOn.unPhasePiece();
                                     spotClickedOn.removePiece();
                                     pieceClickedOn.move(row, column);
                                     removeRedDots();
                                     possibleMoves.clear();
+                                    repaint();
                                     pieceState = Constants.CLICK_ON_PIECE;
                                     // update message other teams turn
                                     if(teamColor == Constants.WHITE) {
@@ -259,11 +258,12 @@ public class Board {
                       (moves.get(j).getRow() == piece.getRow()) &&
                        pieceArray[i].getTeamColor() != (piece.getTeamColor()))
                     {
-                        if(piece.getClass().getName().equals("King")) {
 
-                            System.out.println("Check by: " + pieceArray[i] + " at " + pieceArray[i].getRow() + ", " + pieceArray[i].getColumn() + "Has a move at " + moves.get(j).getRow() + ", " + moves.get(j).getColumn());
-                            //System.out.println(moves.toString());
-                        }
+                            System.out.println("Check by: " + pieceArray[i] + " at " + pieceArray[i].getRow() + ", " + pieceArray[i].getColumn() + " Has a move at " + moves.get(j).getRow() + ", " + moves.get(j).getColumn());
+                            // System.out.println("Piece " + pieceArray[i] + " has moves at: ");
+                            // for(RedDot move: moves) {
+                            //     System.out.print("(" + move.getRow() + ", " + move.getColumn() + ")");
+                            // }
                         
                         if(updateMessage) {
                             if(piece.getTeamColor() == Constants.WHITE) {
