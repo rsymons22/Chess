@@ -3,9 +3,14 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.swing.text.DefaultStyledDocument.ElementSpec;
+
 import javafx.scene.Scene;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -23,28 +28,38 @@ public class Board {
     private Pane pane;
     private Scene scene;
     private Stage primaryStage;
+
+    private TextField statusMessage;
     
-    public Board(Pane pane, Scene scene, Stage primaryStage) {
+    public Board(BorderPane pane, Scene scene, Stage primaryStage, TextField textField) {
         this.pane = pane;
         this.scene = scene;
         this.primaryStage = primaryStage;
+        statusMessage = textField;
         isWhiteTurn = true;
         checkMate = false;
         pieceState = Constants.CLICK_ON_PIECE;
         possibleMoves = new ArrayList<RedDot>();
 
-        pane.getChildren().add(initImage("board"));
+        // TextArea textArea = new TextArea("Test");
+        // textArea.setLayoutX(0);
+        // textArea.setLayoutY(480);
+
+        //pane.getChildren().addAll(initImage("board"));
+        pane.setCenter(initImage("board"));
         initPieces();
         initBoardArray();
 
         pane.setOnMouseClicked(e -> {
-            if(!checkMate) {
-                if(isWhiteTurn) {
-                    System.out.println("white turn, piece state: " + pieceState);
-                    turn(convertToRC((int)(e.getY())), convertToRC((int)(e.getX())), Constants.WHITE);
-                } else {
-                    System.out.println("black turn, piece state: " + pieceState);
-                    turn(convertToRC((int)(e.getY())), convertToRC((int)(e.getX())), Constants.BLACK);
+            if(e.getY() <= 480) {
+                if(!checkMate) {
+                    if(isWhiteTurn) {
+                        System.out.println("white turn, piece state: " + pieceState);
+                        turn(convertToRC((int)(e.getY())), convertToRC((int)(e.getX())), Constants.WHITE);
+                    } else {
+                        System.out.println("black turn, piece state: " + pieceState);
+                        turn(convertToRC((int)(e.getY())), convertToRC((int)(e.getX())), Constants.BLACK);
+                    }
                 }
             }
         });
@@ -125,10 +140,14 @@ public class Board {
                 if(spotClickedOn == null) {// If they click on an empty space
 
                     for (int i = 0; i < possibleMoves.size(); i++) {
-                        if(row == possibleMoves.get(i).getRow() && column == possibleMoves.get(i).getColumn()) {
+                        if(row == possibleMoves.get(i).getRow() && 
+                           column == possibleMoves.get(i).getColumn() && 
+                           !checkMate) 
+                        {
                             pieceClickedOn.phasePiece(row, column);
                             printBoardArray();
-                            if(isInCheck(king, true, true, pieceClickedOn) && !checkMate) {
+                            //System.out.println("Calling is incheck first time case: RED DOTS PLACED and spot clicked on is null");
+                            if(isInCheck(king, true)) {
                                 pieceClickedOn.unPhasePiece();
                                 removeRedDots();
                                 possibleMoves.clear();
@@ -144,10 +163,15 @@ public class Board {
 
                                 if(teamColor == Constants.WHITE) {
                                     isWhiteTurn = false;
+                                    statusMessage.setText("Black Turn");
                                 } else {
                                     isWhiteTurn = true;
+                                    statusMessage.setText("White Turn");
                                 }
-                                isInCheck(opposingKing, true, true, pieceClickedOn);
+                                //System.out.println("Calling isincheck in else statement case: RED DOTS PLACED and spot clicked on is null");
+                                if(isInCheck(opposingKing, true)) {
+                                    isCheckMate(opposingKing);
+                                };
                                 // if(isCheckMate(oppositeTeamColor))
                                 // {
                                 //     checkMate = true;
@@ -173,7 +197,7 @@ public class Board {
                                 pieceClickedOn.phasePiece(row, column);
                                 spotClickedOn.phasePiece(-1, -1);
 
-                                if(isInCheck(king, true, true, pieceClickedOn) && !checkMate) {
+                                if(isInCheck(king, true) && !checkMate) {
                                     pieceClickedOn.unPhasePiece();
                                     spotClickedOn.unPhasePiece();
                                     removeRedDots();
@@ -191,17 +215,15 @@ public class Board {
                                     // update message other teams turn
                                     if(teamColor == Constants.WHITE) {
                                         isWhiteTurn = false;
+                                        statusMessage.setText("Black Turn");
                                     } else {
                                         isWhiteTurn = true;
+                                        statusMessage.setText("White Turn");
                                     }
 
-                                    if(!checkMate) {
-                                        isInCheck(opposingKing, true, true, pieceClickedOn);
-                                    }
-                                    // if(isCheckMate(oppositeTeamColor)) {
-                                    //     checkMate = true;
-                                    //     // update message this team wins check mate
-                                    // }
+                                    if(isInCheck(opposingKing, true)) {
+                                        isCheckMate(opposingKing);
+                                    };
                                     break;
                                 }
                             }
@@ -222,69 +244,35 @@ public class Board {
 
     }
 
-    // private boolean isInCheck(int kingColor, boolean updateMessage, boolean runCheckMate) {
-
-    //     //System.out.println("Calling is In Check (0 = white): " + kingColor);
-
-    //     for(int i = 0; i < 32; i++) { // loop through pieceArray
-
-    //         if(!pieceArray[i].isCaptured() && (!pieceArray[i].isPhased())) { // check if the piece is captured or is phased
-    //             ArrayList<RedDot> arraylist = pieceArray[i].findMoves(); // set the array to the possible moves of the piece
-
-    //             for(int j = 0; j < arraylist.size(); j++) { // loop through the array of the possible moves
-
-    //                 if(arraylist.get(j).getColumn() == getKingColumn(kingColor) && // if an imaginary red dot is on the opposite king
-    //                   (arraylist.get(j).getRow() == getKingRow(kingColor)))
-    //                 {
-    //                     System.out.println("Check");
-
-    //                     if(runCheckMate && isCheckMate(kingColor)) {
-    //                         checkMate = true;
-    //                     }
-                        
-    //                     // if(updateMessage) {
-    //                     //     if(kingColor.equals("white"))
-    //                     //     {
-    //                     //         updateMessage("WTC");
-    //                     //     }
-    //                     //     else
-    //                     //     {
-    //                     //         updateMessage("BTC");
-    //                     //     }
-    //                     // }
-    //                     return true;
-    //                 }
-    //             }
-    //             removeRedDots();
-    //         }
-    //     }
-
-    //     return false;
-    // }
-
-    private boolean isInCheck(Piece piece, boolean updateMessage, boolean runCheckMate, Piece checkingPiece) {
+    private boolean isInCheck(Piece piece, boolean updateMessage) {
 
         //System.out.println("Calling is In Check (0 = white): " + kingColor);
 
         for(int i = 0; i < 32; i++) { // loop through pieceArray
 
             if(!pieceArray[i].isCaptured() && (!pieceArray[i].isPhased())) { // check if the piece is captured or is phased
-                ArrayList<RedDot> arraylist = pieceArray[i].findMoves(); // set the array to the possible moves of the piece
+                ArrayList<RedDot> moves = pieceArray[i].findMoves(); // set the array to the possible moves of the piece
 
-                for(int j = 0; j < arraylist.size(); j++) { // loop through the array of the possible moves
+                for(int j = 0; j < moves.size(); j++) { // loop through the array of the possible moves
 
-                    if(arraylist.get(j).getColumn() == piece.getColumn() && // if an imaginary red dot is on the opposite king
-                      (arraylist.get(j).getRow() == piece.getRow()))
+                    if(moves.get(j).getColumn() == piece.getColumn() && // if an imaginary red dot is on the opposite king
+                      (moves.get(j).getRow() == piece.getRow()) &&
+                       pieceArray[i].getTeamColor() != (piece.getTeamColor()))
                     {
                         if(piece.getClass().getName().equals("King")) {
 
-                            System.out.println("Check");
-
-                            if(runCheckMate && isCheckMate(piece, checkingPiece)) {
-                                checkMate = true;
-                            }
+                            System.out.println("Check by: " + pieceArray[i] + " at " + pieceArray[i].getRow() + ", " + pieceArray[i].getColumn() + "Has a move at " + moves.get(j).getRow() + ", " + moves.get(j).getColumn());
+                            //System.out.println(moves.toString());
                         }
                         
+                        if(updateMessage) {
+                            if(piece.getTeamColor() == Constants.WHITE) {
+                                statusMessage.setText("White Turn - Check");
+                            } else {
+                                statusMessage.setText("Black Turn - Check");
+                            }
+                        }
+
                         // if(updateMessage) {
                         //     if(kingColor.equals("white"))
                         //     {
@@ -305,35 +293,25 @@ public class Board {
         return false;
     }
 
-    private boolean isCheckMate(Piece king, Piece checkingPiece) {
-        System.out.println("entering isCheckMate");
-
-        if(isInCheck(checkingPiece, false, false, checkingPiece)) {
-            return false;
-        }
-
+    private boolean isCheckMate(Piece king) {
+        //System.out.println("entering isCheckMate because of: " + checkingPiece);
 
         int startingPoint = 0;
 
-        if(king.getTeamColor() == Constants.WHITE)
-        {
-            startingPoint = 0;
-        }
-        else
-        {
+        if(king.getTeamColor() == Constants.BLACK) {
             startingPoint = 16;
         }
 
-        for(int i = startingPoint; i < (startingPoint + 15); i++)
+        for(int i = startingPoint; i < (startingPoint + 15); i++) // Loops through all pieces on the team whose king is in check
         {
             Piece piece = pieceArray[i];
-            ArrayList<RedDot> arraylist = piece.findMoves();
+            ArrayList<RedDot> moves = piece.findMoves();
             //System.out.println(kingColor + " " + pieceArray[i] + "piece being checked at i: " + i);
-            for(int k = 0; k < arraylist.size(); k++)
+            for(int k = 0; k < moves.size(); k++) // Loop through their possible moves to see if one of the moves makes the check go away
             {
-                piece.phasePiece(arraylist.get(k).getRow(), arraylist.get(k).getColumn());
+                piece.phasePiece(moves.get(k).getRow(), moves.get(k).getColumn());
                 //System.out.println("going into isInCheck");
-                if(!isInCheck(king, false, false, checkingPiece))
+                if(!isInCheck(king, false))
                 {
                     piece.unPhasePiece();
                     return false;
@@ -342,26 +320,19 @@ public class Board {
             }
         }
 
-        System.out.println("Checkmate");
+        checkMate = true;
+
+        if(king.getTeamColor() == Constants.WHITE) {
+            statusMessage.setText("White king checkmated, Black wins!");
+        } else {
+            statusMessage.setText("Black king checkmated, White wins!");
+        }
+
+        //System.out.println("Checkmate");
         return true;
     }
 
-    private int getKingColumn(int kingColor) {
-        if(kingColor == Constants.WHITE) {
-            return pieceArray[15].getColumn();
-        } else {
-            return pieceArray[31].getColumn();
-        }
-    }
-
-    private int getKingRow(int kingColor)
-    {
-        if(kingColor == Constants.WHITE) {
-            return pieceArray[15].getRow();
-        } else {
-            return pieceArray[31].getRow();
-        }
-    }
+    
 
     public Pane getPane() {
         return pane;

@@ -80,29 +80,14 @@ public abstract class Piece {
     
     public void phasePiece(int phasedRow, int phasedColumn)
     {
-        // isPhased = true;
-        // if(row != -1)
-        //     System.out.println("phasing " + board.getBoardArray()[currentRow][currentColumn] + " to: " + row + ", " + column);
-        // tempRow = currentRow;
-        // tempColumn = currentColumn;
-        
-        // currentRow = row;
-        // currentColumn = column;
-
-        // if(row != -1)
-        //     enemyPiecePhased = board.getBoardArray()[row][column];
-        
-
-        // if(row == -1 || column == -1) {
-        //     board.getBoardArray()[tempRow][tempColumn] = null;
-        // } else {
-        //     board.getBoardArray()[tempRow][tempColumn] = null;
-        //     board.getBoardArray()[currentRow][currentColumn] = this;
-        // }
 
         isPhased = true;
         if (phasedRow != -1) {
             enemyPiecePhased = board.getBoardArray()[phasedRow][phasedColumn];
+            if(enemyPiecePhased != null) {
+                enemyPiecePhased.isCaptured = true;
+            }
+
             board.getBoardArray()[phasedRow][phasedColumn] = this;
             System.out.println("Phasing " + this + " to " + phasedRow + ", " + phasedColumn);
 
@@ -113,37 +98,24 @@ public abstract class Piece {
 
         if(enemyPiecePhased != null) {
             System.out.println("Enemy piece phased: " + enemyPiecePhased + " at " + enemyPieceRow + ", " + enemyPieceColumn);
-            System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------------");
-            board.printBoardArray();
-            System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------------");
+            System.out.println("New location for piece is: " + enemyPiecePhased.getRow() + ", " + enemyPiecePhased.getColumn());
+            //System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------------");
+            //board.printBoardArray();
+            //System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------------");
        }
     }
     
     public void unPhasePiece()
     {
-        // isPhased = false;
-        // if(currentRow != -1 && currentColumn != -1) {
-        //     board.getBoardArray()[currentRow][currentColumn] = null;
-        // }
-
-        // if(enemyPiecePhased != null) {
-        //     System.out.println("Enemy piece unphased: " + enemyPiecePhased);
-        // }
-        // board.getBoardArray()[tempRow][tempColumn] = enemyPiecePhased;
-        // System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------------");
-        // board.printBoardArray();
-        // System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------------");
-
-        // currentRow = tempRow;
-        // currentColumn = tempColumn;
-
-        // System.out.println("unphasing piece that was at: " + currentRow + ", " + currentColumn);
-        // board.getBoardArray()[currentRow][currentColumn] = this;
 
         isPhased = false;
         board.getBoardArray()[currentRow][currentColumn] = this;
+        System.out.println("Unphasing: " + this);
         if(enemyPieceRow != -1)
             board.getBoardArray()[enemyPieceRow][enemyPieceColumn] = enemyPiecePhased;
+        if(enemyPiecePhased != null) {
+            enemyPiecePhased.isCaptured = false;
+        }
     }
 
     public boolean isPhased() {
