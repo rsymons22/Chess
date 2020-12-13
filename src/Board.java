@@ -6,6 +6,8 @@ import java.util.Arrays;
 import javax.swing.text.DefaultStyledDocument.ElementSpec;
 
 import javafx.scene.Scene;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -18,37 +20,40 @@ import javafx.stage.Stage;
 public class Board {
 
     private boolean isWhiteTurn;
-    private boolean checkMate = false;
+    private boolean checkMate;
     private int pieceState;
     private ArrayList<RedDot> possibleMoves;
     private Piece pieceClickedOn;
-    private final static Piece[] pieceArray = new Piece[32];
+    private Piece[] pieceArray;
     private Piece[][] boardArray;
 
     private Pane pane;
     private Scene scene;
     private Stage primaryStage;
-
     private TextField statusMessage;
+
+    private ArrayList<String> moveList;
     
-    public Board(BorderPane pane, Scene scene, Stage primaryStage, TextField textField) {
+    public Board(BorderPane pane, Scene scene, TextField textField, Piece[][] boardArray) {
         this.pane = pane;
         this.scene = scene;
-        this.primaryStage = primaryStage;
+        //this.primaryStage = primaryStage;
         statusMessage = textField;
         isWhiteTurn = true;
         checkMate = false;
+        pieceArray = new Piece[32];
         pieceState = Constants.CLICK_ON_PIECE;
         possibleMoves = new ArrayList<RedDot>();
+        moveList = new ArrayList<>();
 
-        // TextArea textArea = new TextArea("Test");
-        // textArea.setLayoutX(0);
-        // textArea.setLayoutY(480);
-
-        //pane.getChildren().addAll(initImage("board"));
-        pane.setCenter(initImage("board"));
+        pane.setTop(initImage("board"));
         initPieces();
-        initBoardArray();
+
+        if(boardArray == null) { // Meaning the default array will be used
+            initBoardArray();
+        } else {
+            this.boardArray = boardArray;
+        }
 
         pane.setOnMouseClicked(e -> {
             if(e.getY() <= 480) {
@@ -147,7 +152,7 @@ public class Board {
                             pieceClickedOn.phasePiece(row, column);
                             //printBoardArray();
                             //System.out.println("Calling is incheck first time case: RED DOTS PLACED and spot clicked on is null");
-                            if(isInCheck(king, true)) {
+                            if(isInCheck(king, false)) {
                                 pieceClickedOn.unPhasePiece();
                                 removeRedDots();
                                 possibleMoves.clear();
@@ -235,13 +240,6 @@ public class Board {
         
     }
 
-
-
-    // Give the player an option of piece change instead of just queen
-    public void changePawn(Piece piece, int teamColor) {
-
-    }
-
     private boolean isInCheck(Piece piece, boolean updateMessage) {
 
         //System.out.println("Calling is In Check (0 = white): " + kingColor);
@@ -258,7 +256,7 @@ public class Board {
                        pieceArray[i].getTeamColor() != (piece.getTeamColor()))
                     {
 
-                            System.out.println("Check by: " + pieceArray[i] + " at " + pieceArray[i].getCurrentRow() + ", " + pieceArray[i].getCurrentColumn() + " Has a move at " + moves.get(j).getRow() + ", " + moves.get(j).getColumn());
+                            //System.out.println("Check by: " + pieceArray[i] + " at " + pieceArray[i].getCurrentRow() + ", " + pieceArray[i].getCurrentColumn() + " Has a move at " + moves.get(j).getRow() + ", " + moves.get(j).getColumn());
                             // System.out.println("Piece " + pieceArray[i] + " has moves at: ");
                             // for(RedDot move: moves) {
                             //     System.out.print("(" + move.getRow() + ", " + move.getColumn() + ")");
@@ -339,13 +337,13 @@ public class Board {
         return pane;
     }
 
-    public Scene getScene() {
-        return scene;
-    }
+    // public Scene getScene() {
+    //     return scene;
+    // }
 
-    public Stage getPrimaryStage() {
-        return primaryStage;
-    }
+    // public Stage getPrimaryStage() {
+    //     return primaryStage;
+    // }
 
     private void initPieces() {
         for (int i = 0; i < 8; i++) {
@@ -422,6 +420,10 @@ public class Board {
     public void repaint() {
         scene.getWindow().setOpacity(0.999); // This must be done to reset or "repaint" the javafx scene so the red dot's removal gets updated.
         scene.getWindow().setOpacity(1); // This simply updates the frame so it checks everything again, this is due to a bug in JavaFX. 
+    }
+
+    public ArrayList<String> getMoveList() {
+        return moveList;
     }
 
 }

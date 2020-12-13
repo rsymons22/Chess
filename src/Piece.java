@@ -3,6 +3,9 @@ import java.util.ArrayList;
 import javafx.animation.PathTransition;
 import javafx.animation.TranslateTransition;
 import javafx.animation.PathTransition.OrientationType;
+import javafx.collections.FXCollections;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.Line;
@@ -30,7 +33,7 @@ public abstract class Piece {
         this.teamColor = teamColor;
 
         pieceImage.setLayoutX(column * 60); // Each board square and piece is 60 pixels long. 
-        pieceImage.setLayoutY(row * 60);
+        pieceImage.setLayoutY((row * 60));
         board.getPane().getChildren().add(pieceImage);
         this.pieceImage = pieceImage;
     }
@@ -73,7 +76,7 @@ public abstract class Piece {
     
     public void move(int row, int column) {
 
-        
+        board.getMoveList().add(formatMove(row, column));
         
         TranslateTransition transition = new TranslateTransition(Duration.seconds(0.5), pieceImage);
         transition.setFromX(pieceImage.getTranslateX());
@@ -84,8 +87,19 @@ public abstract class Piece {
         transition.playFromStart();
 
         changeLocation(row, column, this);
-        
-        
+    }
+
+    private String formatMove(int row, int column) {
+        String teamColor;
+        String pieceType = this.getClass().getName();
+
+        if(this.teamColor == Constants.WHITE) {
+            teamColor = "White";
+        } else {
+            teamColor = "Black";
+        }
+
+        return teamColor + " " + pieceType + " to " + (row + 1) + ", " + (column + 1); 
     }
     
     public void changeLocation(int row, int column, Piece piece) {
@@ -152,5 +166,19 @@ public abstract class Piece {
 
     public boolean isPhased() {
         return isPhased;
+    }
+
+    // Give the player an option of piece change instead of just queen
+    public void changePawn(Piece piece, int teamColor) {
+    //     System.out.println("Change pawn");
+
+    //     String[] pieces = {"Queen", "Knight", "Rook", "Bishop"};
+    //     ListView<String> lv = new ListView<> (FXCollections.observableArrayList(pieces));
+    //     lv.setPrefSize(100, 100);
+    //     lv.setLayoutX(getCurrentColumn() * Constants.PIECE_LENGTH);
+    //     lv.setLayoutY(getCurrentRow() * Constants.PIECE_LENGTH);
+    //     lv.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
+    //     board.getPane().getChildren().add(lv);
     }
 }

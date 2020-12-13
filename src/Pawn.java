@@ -107,12 +107,12 @@ public class Pawn extends Piece {
         
         if(getCurrentRow() == 0 && teamColor == Constants.WHITE)
         {
-            board.changePawn(this, teamColor);
+            changePawn(this, teamColor);
         }
 
         if(getCurrentRow() == 7 && teamColor == Constants.BLACK)
         {
-            board.changePawn(this, teamColor);
+            changePawn(this, teamColor);
         }
     }
 }
