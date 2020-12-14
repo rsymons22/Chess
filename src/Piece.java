@@ -1,18 +1,12 @@
 import java.util.ArrayList;
-
-import javafx.animation.PathTransition;
+import java.util.Arrays;
 import javafx.animation.TranslateTransition;
-import javafx.animation.PathTransition.OrientationType;
-import javafx.collections.FXCollections;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.image.ImageView;
-import javafx.scene.shape.CubicCurveTo;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
 import javafx.util.Duration;
 
+/**
+ * Abstract Piece class that the specific piece classes extend off of. Contains general piece methods and variables. 
+ */
 public abstract class Piece {    
     private boolean isCaptured;
     protected ImageView pieceImage;
@@ -32,12 +26,13 @@ public abstract class Piece {
         this.board = board;
         this.teamColor = teamColor;
 
-        pieceImage.setLayoutX(column * 60); // Each board square and piece is 60 pixels long. 
-        pieceImage.setLayoutY((row * 60));
+        pieceImage.setLayoutX(column * Constants.PIECE_LENGTH);
+        pieceImage.setLayoutY((row * Constants.PIECE_LENGTH));
         board.getPane().getChildren().add(pieceImage);
         this.pieceImage = pieceImage;
     }
 
+    // Gets the current row of this piece, if it is not found it returns -1
     public int getCurrentRow() {
         Piece[][] boardArray = board.getBoardArray();
 
@@ -52,6 +47,7 @@ public abstract class Piece {
         return -1;
     }
 
+    // Gets the current column of this piece, if it is not found it returns -1
     public int getCurrentColumn() {
         Piece[][] boardArray = board.getBoardArray();
 
@@ -66,18 +62,22 @@ public abstract class Piece {
         return -1;
     }
 
+    // Gets this piece's image
     public ImageView getPieceImage() {
         return pieceImage;
     }
 
+    // Gets the team color of this piece
     public int getTeamColor() {
         return teamColor;
     }
 
+    // Default findMoves method to be overwritten by specific pieces' methods
     public ArrayList<RedDot> findMoves() {
         return null;
     }
     
+    // Moves the piece image with fancy animations and calls change location
     public void move(int row, int column) {
 
         board.getMoveList().add(formatMove(row, column));
@@ -85,14 +85,15 @@ public abstract class Piece {
         TranslateTransition transition = new TranslateTransition(Duration.seconds(0.5), pieceImage);
         transition.setFromX(pieceImage.getTranslateX());
         transition.setFromY(pieceImage.getTranslateY());
-        transition.setToX(pieceImage.getTranslateX() + ((column - getCurrentColumn()) * 60));
-        transition.setToY(pieceImage.getTranslateY() + ((row - getCurrentRow()) * 60));
+        transition.setToX(pieceImage.getTranslateX() + ((column - getCurrentColumn()) * Constants.PIECE_LENGTH));
+        transition.setToY(pieceImage.getTranslateY() + ((row - getCurrentRow()) * Constants.PIECE_LENGTH));
 
         transition.playFromStart();
 
         changeLocation(row, column, this);
     }
 
+    // Formats the move string key for exporting moves
     private String formatMove(int row, int column) {
         String teamColor;
         String pieceType = this.getClass().getName();
@@ -106,83 +107,79 @@ public abstract class Piece {
         return teamColor + " " + pieceType + " to " + (row + 1) + ", " + (column + 1); 
     }
     
+    // Changes a piece's location on the board array
     public void changeLocation(int row, int column, Piece piece) {
-        //pieceImage.setLayoutX(column * 60);
-        //pieceImage.setLayoutY(row * 60);
-
-        //System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------------");
-        //board.printBoardArray();
-        //System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------------");
-        //System.out.println("Piece changeLocation, setting piece at: " + getCurrentRow() + ", " + getCurrentColumn());
         board.getBoardArray()[getCurrentRow()][getCurrentColumn()] = null;
         board.getBoardArray()[row][column] = piece;
     }
     
-    public void removePiece()
-    {
-        //System.out.println("Removing piece: " + pieceImage + " at " + getCurrentRow() + ", " + getCurrentColumn());
+    // Removes a piece from the array and from the board, sets isCaptured to true;
+    public void removePiece() {
         board.getPane().getChildren().remove(pieceImage);
         isCaptured = true;
         board.getBoardArray()[getCurrentRow()][getCurrentColumn()] = null;
 
     }
-    
-    public boolean isCaptured()
-    {
+    // Returns if the piece is captured
+    public boolean isCaptured() {
         return isCaptured;
     }
     
-    public void phasePiece(int phasedRow, int phasedColumn)
-    {
+    /**
+     * "Phasing" a piece is theoretically moving a piece to a certain position. In code, this will change the array position to match
+     * the phased coordinates, but the images on the board will not reflect this. This method is the cornerstone of the isInCheck and isCheckmate
+     * method as they use phasing to determine if a move will put a king check or save a king from being in check. This method will also phase an enemy piece if
+     * it were to be theoretically captured. 
+     */
+    public void phasePiece(int phasedRow, int phasedColumn) {
 
         isPhased = true;
         enemyPiecePhased = board.getBoardArray()[phasedRow][phasedColumn];
         if(enemyPiecePhased != null) { // Is actually a piece
             enemyPiecePhased.isCaptured = true;
             board.getBoardArray()[enemyPiecePhased.getCurrentRow()][enemyPiecePhased.getCurrentColumn()] = null;
-            //System.out.println("Phasing enemy piece: " + enemyPiecePhased + "to: " + enemyPiecePhased.getRow() + ", " + enemyPiecePhased.getColumn());
         }
 
-            board.getBoardArray()[phasedRow][phasedColumn] = this;
-            //System.out.println("Phasing " + this + " to " + phasedRow + ", " + phasedColumn);
-
-            enemyPieceRow = phasedRow;
-            enemyPieceColumn = phasedColumn;
-
-            beforePhasedRow = getCurrentRow();
-            beforePhasedColumn = getCurrentColumn();
+        beforePhasedRow = getCurrentRow();
+        beforePhasedColumn = getCurrentColumn();
 
         board.getBoardArray()[getCurrentRow()][getCurrentColumn()] = null;
+
+        board.getBoardArray()[phasedRow][phasedColumn] = this;
+
+        enemyPieceRow = phasedRow;
+        enemyPieceColumn = phasedColumn;
     }
     
-    public void unPhasePiece()
-    {
-
+    // Unphase the piece by returning it to its original position, and an enemy piece aswell if it was captured during phasing
+    public void unPhasePiece() {
         isPhased = false;
         board.getBoardArray()[beforePhasedRow][beforePhasedColumn] = this;
-        //System.out.println("Unphasing: " + this);
-        //if(enemyPieceRow != -1)
         board.getBoardArray()[enemyPieceRow][enemyPieceColumn] = enemyPiecePhased;
         if(enemyPiecePhased != null) {
             enemyPiecePhased.isCaptured = false;
         }
     }
 
+    // Get if the piece is phased
     public boolean isPhased() {
         return isPhased;
     }
 
-    // Give the player an option of piece change instead of just queen
+    // Change a pawn into a queen
     public void changePawn(Piece piece, int teamColor) {
-    //     System.out.println("Change pawn");
 
-    //     String[] pieces = {"Queen", "Knight", "Rook", "Bishop"};
-    //     ListView<String> lv = new ListView<> (FXCollections.observableArrayList(pieces));
-    //     lv.setPrefSize(100, 100);
-    //     lv.setLayoutX(getCurrentColumn() * Constants.PIECE_LENGTH);
-    //     lv.setLayoutY(getCurrentRow() * Constants.PIECE_LENGTH);
-    //     lv.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        String teamColorImageStr = "";
+        if(teamColor == Constants.WHITE) {
+            teamColorImageStr = "white";
+        } else {
+            teamColorImageStr = "black";
+        }
 
-    //     board.getPane().getChildren().add(lv);
+        int index = Arrays.asList(board.getPieceArray()).indexOf(piece);
+        
+        board.getPane().getChildren().remove(pieceImage);
+        board.getPieceArray()[index] = new Queen(teamColor, board, getCurrentRow(), getCurrentColumn(), board.initImage(teamColorImageStr + "Queen"));
+        board.getBoardArray()[getCurrentRow()][getCurrentColumn()] = board.getPieceArray()[index];
     }
 }

@@ -2,12 +2,16 @@ import java.util.ArrayList;
 
 import javafx.scene.image.ImageView;
 
+/**
+ * Class King that extends piece. Contains specific moves for each of the king's possible 8 moves.
+ */
 public class King extends Piece {
 
     public King(int teamColor, Board board, int startingRow, int startingColumn, ImageView pieceImage) {
         super(teamColor, board, startingRow, startingColumn, pieceImage);  
     }
 
+    // Finds the possible moves by simply checking in all 8 spaces around the king
     public ArrayList<RedDot> findMoves()
     {
         possibleMoves = new ArrayList<RedDot>();
@@ -49,6 +53,7 @@ public class King extends Piece {
         return possibleMoves;
     }
 
+    // Small method to simplify creating king moves
     private void kingMove(int row, int column, Piece[][] boardArray) {
         if(boardArray[row][column] == null ||
           (boardArray[row][column].getTeamColor() != teamColor))

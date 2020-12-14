@@ -11,6 +11,9 @@ import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+/**
+ * Creates the status bar and buttons at the bottom of the window. Contains logic for importing and exporting files. 
+ */
 public class ActionBar {
     
     private String[][] fileBoardArray;
@@ -23,10 +26,7 @@ public class ActionBar {
         initButtons(hBox, primaryStage);
     }
 
-    public HBox getHBox() {
-        return hBox;
-    }
-
+    // Initializes the buttons
     private void initButtons(HBox hBox, Stage primaryStage) {
         Button quitButton = new Button("Quit");
         Button importBoardButton = new Button("Import Board");
@@ -71,7 +71,6 @@ public class ActionBar {
                 e1.printStackTrace();
             }
 
-            //System.out.println(Arrays.deepToString(formatBoard(fileBoardArray, board)));
             if(selectedFile != null) {
                 Chess.resetBoard();
                 Chess.getBoard().removeAllPieceImages();
@@ -80,7 +79,7 @@ public class ActionBar {
         });
 
         exportMovesButton.setOnAction(e -> {
-            System.out.println("Writing to file");
+
             try {
                 File selectedFile = fileChooser.showOpenDialog(primaryStage);
                 FileWriter writer;
@@ -105,6 +104,7 @@ public class ActionBar {
         });
     }
 
+    // Formats the board recieved from the file.
     protected Piece[][] formatBoard(Board board) {
         Piece[][] newBoardArray = new Piece[8][8];
 
@@ -159,6 +159,11 @@ public class ActionBar {
         }
         return newBoardArray;
 
+    }
+
+    // Gets the horizontal box the buttons are stored in
+    public HBox getHBox() {
+        return hBox;
     }
 
 }

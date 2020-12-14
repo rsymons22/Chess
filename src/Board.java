@@ -1,23 +1,18 @@
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import javax.swing.Action;
-import javax.swing.text.DefaultStyledDocument.ElementSpec;
 
 import javafx.scene.Scene;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+/**
+ * Board class that contains all the code for piece turns and check/checkmate logic. 
+ */
 public class Board {
 
     private boolean isWhiteTurn;
@@ -30,173 +25,41 @@ public class Board {
 
     private Pane pane;
     private Scene scene;
-    private Stage primaryStage;
     private TextField statusMessage;
 
     private ArrayList<String> moveList;
     
     public Board(BorderPane pane, Scene scene, Stage primaryStage, TextField textField, ActionBar actionBar) {
         setToDefaults(pane, scene, primaryStage, textField);
+    }  
 
-        // if(usingModifiedArray) {
+    // --------------------------------------------- Main Game Methods ---------------------------------------------------------------------
 
-        //     boardArray = actionBar.formatBoard(this);
-
-        //     int pieceArrayIndex = 0;
-
-        //     for(int r = 0; r < boardArray.length; r++) {
-        //         for(int c = 0; c < boardArray[r].length; c++) {
-        //             if(boardArray[r][c] != null) {
-        //                 pieceArray[pieceArrayIndex++] = boardArray[r][c]; 
-        //             }
-        //         }
-        //     }
-            
-        // } else {
-        //     System.out.println("Using default array");
-        //     initPieces();
-        //     initBoardArray();
-        // }
-
-        // if(boardArray == null) { // Meaning the default array will be used
-        //     System.out.println("Using default array");
-        //     initPieces();
-        //     initBoardArray();
-        // } else {
-        //     System.out.println("using modified array");
-        //     int pieceArrayIndex = 0;
-        //         for(int r = 0; r < boardArray.length; r++) {
-        //             for(int c = 0; c < boardArray[r].length; c++) {
-        //                 if(boardArray[r][c] != null) {
-        //                     setPieceArray(pieceArrayIndex, boardArray[r][c]); 
-        //                     pieceArrayIndex++;
-        //                 }
-        //             }
-        //         }
-            
-        //     this.boardArray = boardArray;
-        // }
-
-        System.out.println(Arrays.toString(pieceArray));
-            System.out.println("------------------------------------------------");
-            System.out.println(Arrays.deepToString(this.boardArray));
-
-        
-            
-            
-
-        
-
-    }
-
-    public void removeAllPieceImages() {
-        for (int i = 0; i < pieceArray.length; i++) {
-            if(pieceArray[i] != null) {
-                pane.getChildren().remove(pieceArray[i].getPieceImage());
-            }
-        }
-    }
-
-    public void setToDefaults(BorderPane pane, Scene scene, Stage primaryStage, TextField textField) {
-        this.pane = pane;
-        this.scene = scene;
-        this.primaryStage = primaryStage;
-        statusMessage = textField;
-        isWhiteTurn = true;
-        checkMate = false;
-        pieceArray = new Piece[32];
-        pieceState = Constants.CLICK_ON_PIECE;
-        possibleMoves = new ArrayList<RedDot>();
-        moveList = new ArrayList<>();
-        boardArray = null;
-
-        pane.setTop(initImage("board"));
-
-        initPieces();
-        initBoardArray();
-
-        pane.setOnMouseClicked(e -> {
-            System.out.println("Mouse clicked");
-            if(e.getY() <= 480) {
-                if(!checkMate) {
-                    if(isWhiteTurn) {
-                        System.out.println("white turn, piece state: " + pieceState);
-                        turn(convertToRC((int)(e.getY())), convertToRC((int)(e.getX())), Constants.WHITE);
-                    } else {
-                        System.out.println("black turn, piece state: " + pieceState);
-                        turn(convertToRC((int)(e.getY())), convertToRC((int)(e.getX())), Constants.BLACK);
-                    }
-                }
-            }
-        });
-    }
-
-    public void modifyBoardArray(Piece[][] boardArray) {
-        this.boardArray = boardArray;
-        System.out.println("using modified array");
-        int pieceArrayIndex = 0;
-        for(int r = 0; r < boardArray.length; r++) {
-            for(int c = 0; c < boardArray[r].length; c++) {
-                if(boardArray[r][c] != null) {
-                    pieceArray[pieceArrayIndex] = boardArray[r][c];
-                    pieceArrayIndex++;
-                }
-            }
-        }
-    }
-
-    private int convertToRC(int num) {
-        int pixels = Constants.PIECE_LENGTH;
-        for(int rc = 0; rc <= 7; rc++) {
-            if(num <= pixels) {
-                return rc;
-            }
-            pixels += 60;
-        }
-
-        System.out.println("Unexpected mouse click location");
-        return -1;
-    }
-
-    public void printBoardArray() {
-        for(int i = 0; i < 8; i++) {
-            System.out.println(Arrays.toString(boardArray[i]));
-        }
-    }
-
-    public Piece[][] getBoardArray() {
-        return boardArray;
-    }
-
+    /**
+     *  Main turn method that handles two states:
+     *      CLICK_ON_PIECE: handles where the user clicks, will display red dots if a piece clicked on has possible moves.
+     *      RED_DOTS_PLACED: will either move to the red dot clicked on or remove red dots if user clicked on the same piece. 
+     * 
+     * Moving pieces checks to see if the move will put their King in check and will either allow or disallow the move based on the result. 
+     */
     private void turn(int row, int column, int teamColor) {
-        //System.out.println("turn method called on: " + row + "," + column);
-        int oppositeTeamColor;
-
-        if(teamColor == Constants.WHITE) {
-            oppositeTeamColor = Constants.BLACK;
-        } else {
-            oppositeTeamColor = Constants.WHITE;
-        }
 
         switch(pieceState) {
             case Constants.CLICK_ON_PIECE:
-            //System.out.println("Click on piece state");
+
                 pieceClickedOn = boardArray[row][column];
-                //System.out.println("Piece clicked on: " + row + ", " + column + ": " + pieceClickedOn);
-                if(pieceClickedOn != null) { // If they click on a piece
-                    //System.out.println("Clicked on piece");
+
+                if(pieceClickedOn != null) { // If user click on a piece
+
                     if(pieceClickedOn.getTeamColor() == teamColor) { // If the piece is on the team of whos turn it is
-                        //System.out.println("Clicked on piece of: " + teamColor);
-                        possibleMoves = pieceClickedOn.findMoves(); 
+
+                        possibleMoves = pieceClickedOn.findMoves(); // Show the possible moves
                         setDotsVisible();
-                        if(possibleMoves.isEmpty()) {
-                            //System.out.println("No possible moves, clearing");
-                            removeRedDots();
-                            possibleMoves.clear();
-                        } else {
-                            //System.out.println("Setting piece state to red dots placed");
+
+                        if(!possibleMoves.isEmpty()) { // Change state if there are possible moves
                             pieceState = Constants.RED_DOTS_PLACED;
                         }
+
                     }
                 }
                 break;
@@ -217,31 +80,28 @@ public class Board {
                 Piece spotClickedOn = boardArray[row][column];
 
                 if(spotClickedOn == null) {// If they click on an empty space
-                    System.out.println("Clicked on an empty space");
+                    
                     for (int i = 0; i < possibleMoves.size(); i++) {
+
                         if(row == possibleMoves.get(i).getRow() && 
                            column == possibleMoves.get(i).getColumn() && 
-                           !checkMate) 
+                           !checkMate) // User clicked on a spot that is a red dot (possible move)
                         {
-                            System.out.println("Clicked on a space that is a red dot");
                             pieceClickedOn.phasePiece(row, column);
-                            //printBoardArray();
-                            //System.out.println("Calling is incheck first time case: RED DOTS PLACED and spot clicked on is null");
-                            if(isInCheck(king, false)) {
-                                System.out.println("move puts king in check");
+
+                            if(isInCheck(king, false)) { // Move would put king or have king remain in check, therefore the move is canceled
                                 pieceClickedOn.unPhasePiece();
                                 removeRedDots();
                                 possibleMoves.clear();
                                 pieceState = Constants.CLICK_ON_PIECE;
-                            } else {
-                                System.out.println("Moving piece");
+                            } else { // Move doesn't put king in check, therefore the move is executed
                                 pieceClickedOn.unPhasePiece();
                                 pieceClickedOn.move(row, column);
                                 removeRedDots();
                                 possibleMoves.clear();
                                 repaint();
                                 pieceState = Constants.CLICK_ON_PIECE;
-                                //update message other teams turn
+
 
                                 if(teamColor == Constants.WHITE) {
                                     isWhiteTurn = false;
@@ -250,22 +110,18 @@ public class Board {
                                     isWhiteTurn = true;
                                     statusMessage.setText("White Turn");
                                 }
-                                //System.out.println("Calling isincheck in else statement case: RED DOTS PLACED and spot clicked on is null");
-                                if(isInCheck(opposingKing, true)) {
+                                
+                                if(isInCheck(opposingKing, true)) { // Checks to see if the opposing king is now in check due to the move
                                     isCheckMate(opposingKing);
                                 };
                             }
                         }
                     }
-                } else if(spotClickedOn == pieceClickedOn) {
-
-                    //System.out.println("Clicked on same piece");
+                } else if(spotClickedOn == pieceClickedOn) { // If the user clicks on the same piece remove the red dots and return to the CLICK_ON_PIECE state
                     removeRedDots();
                     possibleMoves.clear();
                     pieceState = Constants.CLICK_ON_PIECE;
-                } else {
-
-                    if(spotClickedOn.getTeamColor() != teamColor) {
+                } else if(spotClickedOn.getTeamColor() != teamColor) { // If the user clicks on an enemy piece
 
                         for (int i = 0; i < possibleMoves.size(); i++) {
 
@@ -273,28 +129,23 @@ public class Board {
                                column == possibleMoves.get(i).getColumn() &&
                                !checkMate) {
 
-                                
-                                ///spotClickedOn.phasePiece(-1, -1);
-                                //System.out.println("Phasing to-be captured piece: " + spotClickedOn + "to: " + spotClickedOn.getRow() + ", " + spotClickedOn.getColumn());
                                 pieceClickedOn.phasePiece(row, column);
                                 
 
                                 if(isInCheck(king, true)) {
                                     pieceClickedOn.unPhasePiece();
-                                    //spotClickedOn.unPhasePiece();
                                     removeRedDots();
                                     possibleMoves.clear();
                                     pieceState = Constants.CLICK_ON_PIECE;
                                 } else {
                                     pieceClickedOn.unPhasePiece();
-                                    //spotClickedOn.unPhasePiece();
                                     spotClickedOn.removePiece();
                                     pieceClickedOn.move(row, column);
                                     removeRedDots();
                                     possibleMoves.clear();
                                     repaint();
                                     pieceState = Constants.CLICK_ON_PIECE;
-                                    // update message other teams turn
+
                                     if(teamColor == Constants.WHITE) {
                                         isWhiteTurn = false;
                                         statusMessage.setText("Black Turn");
@@ -311,31 +162,16 @@ public class Board {
                             }
                         }
                     }
-                }
-                break;
+                    break;
+                }  
         }
 
-        printBoardArray();
-        
-    }
-
-    public Piece findKing(int teamColor) {
-        for (int i = 0; i < pieceArray.length; i++) {
-            if(pieceArray[i].getClass().getName().equals("King")) {
-                if(pieceArray[i].getTeamColor() == teamColor)
-                    return pieceArray[i];
-            }
-        }
-        return null;
-    }
-
+    // Sees if the king passed in is in check or not.
     private boolean isInCheck(Piece piece, boolean updateMessage) {
-
-        //System.out.println("Calling is In Check (0 = white): " + kingColor);
 
         for(int i = 0; i < 32; i++) { // loop through pieceArray
 
-            if(!pieceArray[i].isCaptured() && (!pieceArray[i].isPhased())) { // check if the piece is captured or is phased
+            if(!pieceArray[i].isCaptured()) { //&& (!pieceArray[i].isPhased())) { // check if the piece is captured or is phased
                 ArrayList<RedDot> moves = pieceArray[i].findMoves(); // set the array to the possible moves of the piece
 
                 for(int j = 0; j < moves.size(); j++) { // loop through the array of the possible moves
@@ -345,13 +181,6 @@ public class Board {
                        pieceArray[i].getTeamColor() != (piece.getTeamColor()))
                     {
 
-                            System.out.println("Check by: " + pieceArray[i] + " at " + pieceArray[i].getCurrentRow() + ", " + pieceArray[i].getCurrentColumn() + " Has a move at " + moves.get(j).getRow() + ", " + moves.get(j).getColumn());
-                            System.out.println("Piece that is checked: " + piece);
-                            // System.out.println("Piece " + pieceArray[i] + " has moves at: ");
-                            // for(RedDot move: moves) {
-                            //     System.out.print("(" + move.getRow() + ", " + move.getColumn() + ")");
-                            // }
-                        
                         if(updateMessage) {
                             if(piece.getTeamColor() == Constants.WHITE) {
                                 statusMessage.setText("White Turn - Check");
@@ -360,16 +189,6 @@ public class Board {
                             }
                         }
 
-                        // if(updateMessage) {
-                        //     if(kingColor.equals("white"))
-                        //     {
-                        //         updateMessage("WTC");
-                        //     }
-                        //     else
-                        //     {
-                        //         updateMessage("BTC");
-                        //     }
-                        // }
                         return true;
                     }
                 }
@@ -380,25 +199,20 @@ public class Board {
         return false;
     }
 
+    // Determines if the king passed in to the method is in checkmate
     private boolean isCheckMate(Piece king) {
-        //System.out.println("entering isCheckMate because of: " + checkingPiece);
 
-        int startingPoint = 0;
-
-        if(king.getTeamColor() == Constants.BLACK) {
-            startingPoint = 16;
-        }
-
-        for(int i = startingPoint; i < (startingPoint + 15); i++) // Loops through all pieces on the team whose king is in check
+        for(int i = 0; i < pieceArray.length; i++) // Loops through all pieces on the team whose king is in check
         {
-            if(!pieceArray[i].isCaptured()) {
+            if(pieceArray[i].getTeamColor() == king.getTeamColor() && !pieceArray[i].isCaptured()) { // Check if the piece is captured
+
             Piece piece = pieceArray[i];
             ArrayList<RedDot> moves = piece.findMoves();
-            //System.out.println(kingColor + " " + pieceArray[i] + "piece being checked at i: " + i);
+
             for(int k = 0; k < moves.size(); k++) // Loop through their possible moves to see if one of the moves makes the check go away
             {
                 piece.phasePiece(moves.get(k).getRow(), moves.get(k).getColumn());
-                //System.out.println("going into isInCheck");
+
                 if(!isInCheck(king, false))
                 {
                     piece.unPhasePiece();
@@ -417,24 +231,43 @@ public class Board {
             statusMessage.setText("Black king checkmated, White wins!");
         }
 
-        //System.out.println("Checkmate");
         return true;
     }
 
-    
+    // ---------------------------------------------------- Initialization Methods -------------------------------------------------------
 
-    public Pane getPane() {
-        return pane;
+    // Sets the board's variables to their default values
+    public void setToDefaults(BorderPane pane, Scene scene, Stage primaryStage, TextField textField) {
+        this.pane = pane;
+        this.scene = scene;
+        statusMessage = textField;
+        isWhiteTurn = true;
+        checkMate = false;
+        pieceArray = new Piece[32];
+        pieceState = Constants.CLICK_ON_PIECE;
+        possibleMoves = new ArrayList<RedDot>();
+        moveList = new ArrayList<>();
+        boardArray = null;
+
+        pane.setTop(initImage("board"));
+
+        initPieces();
+        initBoardArray();
+
+        pane.setOnMouseClicked(e -> {
+            if(e.getY() <= 480) { // Ensure that the mouse click is above the action bar
+                if(!checkMate) {
+                    if(isWhiteTurn) {
+                        turn(convertToRC((int)(e.getY())), convertToRC((int)(e.getX())), Constants.WHITE);
+                    } else {
+                        turn(convertToRC((int)(e.getY())), convertToRC((int)(e.getX())), Constants.BLACK);
+                    }
+                }
+            }
+        });
     }
 
-    // public Scene getScene() {
-    //     return scene;
-    // }
-
-    // public Stage getPrimaryStage() {
-    //     return primaryStage;
-    // }
-
+    // Initializes the basic pieces
     private void initPieces() {
         for (int i = 0; i < 8; i++) {
             pieceArray[i] = new Pawn(Constants.WHITE, this, 6, i, initImage("whitePawn"));
@@ -463,6 +296,7 @@ public class Board {
         pieceArray[31] = new King(Constants.BLACK, this, 0, 4, initImage("blackKing"));
     }
 
+    // Initialize a piece image. Returns null and prints out an error statement if no image is found.
     public ImageView initImage(String imageName) {
         try {
             return new ImageView(new Image(new FileInputStream("images\\" + imageName + ".png")));
@@ -472,25 +306,7 @@ public class Board {
         return null;
     }
 
-    public void setDotsVisible()
-    {
-        //System.out.println("Setting dots visible");
-        for(int i = 0; i < possibleMoves.size(); i++)
-        {
-            possibleMoves.get(i).setLocation();
-        }
-    }
-
-    public void removeRedDots()
-    {
-        for(int i = 0; i < possibleMoves.size(); i++)
-        {
-            possibleMoves.get(i).remove(pane);
-        }
-        repaint();
-        
-    }
-
+    // Initialize the board array with default piece positions
     public void initBoardArray() {
     
         Piece[][] boardArray = {
@@ -507,16 +323,98 @@ public class Board {
         this.boardArray = boardArray;
     }
 
+    // ----------------------------------------------------------------- Miscellaneous --------------------------------------------------------- 
+
+    // Finds the king to the corresponding team color in the pieceArray.
+    public Piece findKing(int teamColor) {
+        for (int i = 0; i < pieceArray.length; i++) {
+            if(pieceArray[i].getClass().getName().equals("King")) {
+                if(pieceArray[i].getTeamColor() == teamColor)
+                    return pieceArray[i];
+            }
+        }
+        return null;
+    }
+
+    // Set the red dots visible
+    public void setDotsVisible() {
+        for(int i = 0; i < possibleMoves.size(); i++)
+        {
+            possibleMoves.get(i).setLocation();
+        }
+    }
+
+    // Remove the red dots from the board
+    public void removeRedDots() {
+        for(int i = 0; i < possibleMoves.size(); i++)
+        {
+            possibleMoves.get(i).remove(pane);
+        }
+        repaint();
+        
+    }
+
+    // "Repaints" the scene so the red dots get updated
     public void repaint() {
         scene.getWindow().setOpacity(0.999); // This must be done to reset or "repaint" the javafx scene so the red dot's removal gets updated.
         scene.getWindow().setOpacity(1); // This simply updates the frame so it checks everything again, this is due to a bug in JavaFX. 
     }
 
+    // Removes all the piece images from the board
+    public void removeAllPieceImages() {
+        for (int i = 0; i < pieceArray.length; i++) {
+            if(pieceArray[i] != null) {
+                pane.getChildren().remove(pieceArray[i].getPieceImage());
+            }
+        }
+    }
+
+    // Modifys the boardArray with a new one, used in importing a new board
+    public void modifyBoardArray(Piece[][] boardArray) {
+        this.boardArray = boardArray;
+        int pieceArrayIndex = 0;
+        for(int r = 0; r < boardArray.length; r++) {
+            for(int c = 0; c < boardArray[r].length; c++) {
+                if(boardArray[r][c] != null) {
+                    pieceArray[pieceArrayIndex] = boardArray[r][c];
+                    pieceArrayIndex++;
+                }
+            }
+        }
+    }
+
+    // Converts pixel value to the corresponding row or column value
+    private int convertToRC(int num) {
+        int pixels = Constants.PIECE_LENGTH;
+        for(int rc = 0; rc <= 7; rc++) {
+            if(num <= pixels) {
+                return rc;
+            }
+            pixels += Constants.PIECE_LENGTH;
+        }
+
+        System.out.println("Unexpected mouse click location");
+        return -1;
+    }
+
+    // ------------------------------------------------------------ Getters -----------------------------------------------------------------
+
+    // Gets the move list
     public ArrayList<String> getMoveList() {
         return moveList;
     }
 
-    public void setPieceArray(int index, Piece piece) {
-        pieceArray[index] = piece;
+    // Gets the pieces
+    public Pane getPane() {
+        return pane;
+    }
+
+    // Gets the board array
+    public Piece[][] getBoardArray() {
+        return boardArray;
+    }
+
+    public Piece[] getPieceArray() {
+        return pieceArray;
     }
 }

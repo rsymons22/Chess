@@ -1,33 +1,14 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Scanner;
-
-import javax.swing.Action;
-
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+/**
+ * Main application that contains the start method. Creates the pane, scene, stage, and board.
+ */
 public class Chess extends Application {
 
     private static BorderPane pane;
@@ -71,10 +52,12 @@ public class Chess extends Application {
         launch(args);
     }
 
+    // Gets the board object
     public static Board getBoard() {
         return board;
     }
 
+    // Resets the board back to as if the window was just launched
     public static void resetBoard() {
         textField.setText("White Turn");
         board.setToDefaults(pane, scene, primaryStage, textField);
