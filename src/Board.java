@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.swing.Action;
 import javax.swing.text.DefaultStyledDocument.ElementSpec;
 
 import javafx.scene.Scene;
@@ -34,10 +35,72 @@ public class Board {
 
     private ArrayList<String> moveList;
     
-    public Board(BorderPane pane, Scene scene, TextField textField, Piece[][] boardArray) {
+    public Board(BorderPane pane, Scene scene, Stage primaryStage, TextField textField, ActionBar actionBar) {
+        setToDefaults(pane, scene, primaryStage, textField);
+
+        // if(usingModifiedArray) {
+
+        //     boardArray = actionBar.formatBoard(this);
+
+        //     int pieceArrayIndex = 0;
+
+        //     for(int r = 0; r < boardArray.length; r++) {
+        //         for(int c = 0; c < boardArray[r].length; c++) {
+        //             if(boardArray[r][c] != null) {
+        //                 pieceArray[pieceArrayIndex++] = boardArray[r][c]; 
+        //             }
+        //         }
+        //     }
+            
+        // } else {
+        //     System.out.println("Using default array");
+        //     initPieces();
+        //     initBoardArray();
+        // }
+
+        // if(boardArray == null) { // Meaning the default array will be used
+        //     System.out.println("Using default array");
+        //     initPieces();
+        //     initBoardArray();
+        // } else {
+        //     System.out.println("using modified array");
+        //     int pieceArrayIndex = 0;
+        //         for(int r = 0; r < boardArray.length; r++) {
+        //             for(int c = 0; c < boardArray[r].length; c++) {
+        //                 if(boardArray[r][c] != null) {
+        //                     setPieceArray(pieceArrayIndex, boardArray[r][c]); 
+        //                     pieceArrayIndex++;
+        //                 }
+        //             }
+        //         }
+            
+        //     this.boardArray = boardArray;
+        // }
+
+        System.out.println(Arrays.toString(pieceArray));
+            System.out.println("------------------------------------------------");
+            System.out.println(Arrays.deepToString(this.boardArray));
+
+        
+            
+            
+
+        
+
+    }
+
+    public void removeAllPieceImages() {
+        for (int i = 0; i < pieceArray.length; i++) {
+            if(pieceArray[i] != null) {
+                pane.getChildren().remove(pieceArray[i].getPieceImage());
+            }
+        }
+    }
+
+    public void setToDefaults(BorderPane pane, Scene scene, Stage primaryStage, TextField textField) {
         this.pane = pane;
         this.scene = scene;
-        //this.primaryStage = primaryStage;
+        this.primaryStage = primaryStage;
         statusMessage = textField;
         isWhiteTurn = true;
         checkMate = false;
@@ -45,30 +108,41 @@ public class Board {
         pieceState = Constants.CLICK_ON_PIECE;
         possibleMoves = new ArrayList<RedDot>();
         moveList = new ArrayList<>();
+        boardArray = null;
 
         pane.setTop(initImage("board"));
-        initPieces();
 
-        if(boardArray == null) { // Meaning the default array will be used
-            initBoardArray();
-        } else {
-            this.boardArray = boardArray;
-        }
+        initPieces();
+        initBoardArray();
 
         pane.setOnMouseClicked(e -> {
+            System.out.println("Mouse clicked");
             if(e.getY() <= 480) {
                 if(!checkMate) {
                     if(isWhiteTurn) {
-                        //System.out.println("white turn, piece state: " + pieceState);
+                        System.out.println("white turn, piece state: " + pieceState);
                         turn(convertToRC((int)(e.getY())), convertToRC((int)(e.getX())), Constants.WHITE);
                     } else {
-                        //System.out.println("black turn, piece state: " + pieceState);
+                        System.out.println("black turn, piece state: " + pieceState);
                         turn(convertToRC((int)(e.getY())), convertToRC((int)(e.getX())), Constants.BLACK);
                     }
                 }
             }
         });
+    }
 
+    public void modifyBoardArray(Piece[][] boardArray) {
+        this.boardArray = boardArray;
+        System.out.println("using modified array");
+        int pieceArrayIndex = 0;
+        for(int r = 0; r < boardArray.length; r++) {
+            for(int c = 0; c < boardArray[r].length; c++) {
+                if(boardArray[r][c] != null) {
+                    pieceArray[pieceArrayIndex] = boardArray[r][c];
+                    pieceArrayIndex++;
+                }
+            }
+        }
     }
 
     private int convertToRC(int num) {
@@ -133,31 +207,34 @@ public class Board {
                 Piece opposingKing;
 
                 if(teamColor == Constants.WHITE) {
-                    king = pieceArray[15];
-                    opposingKing = pieceArray[31];
+                    king = findKing(Constants.WHITE);
+                    opposingKing = findKing(Constants.BLACK);
                 } else {
-                    king = pieceArray[31];
-                    opposingKing = pieceArray[15];
+                    king = findKing(Constants.BLACK);
+                    opposingKing = findKing(Constants.WHITE);
                 }
                 
                 Piece spotClickedOn = boardArray[row][column];
 
                 if(spotClickedOn == null) {// If they click on an empty space
-
+                    System.out.println("Clicked on an empty space");
                     for (int i = 0; i < possibleMoves.size(); i++) {
                         if(row == possibleMoves.get(i).getRow() && 
                            column == possibleMoves.get(i).getColumn() && 
                            !checkMate) 
                         {
+                            System.out.println("Clicked on a space that is a red dot");
                             pieceClickedOn.phasePiece(row, column);
                             //printBoardArray();
                             //System.out.println("Calling is incheck first time case: RED DOTS PLACED and spot clicked on is null");
                             if(isInCheck(king, false)) {
+                                System.out.println("move puts king in check");
                                 pieceClickedOn.unPhasePiece();
                                 removeRedDots();
                                 possibleMoves.clear();
                                 pieceState = Constants.CLICK_ON_PIECE;
                             } else {
+                                System.out.println("Moving piece");
                                 pieceClickedOn.unPhasePiece();
                                 pieceClickedOn.move(row, column);
                                 removeRedDots();
@@ -237,7 +314,19 @@ public class Board {
                 }
                 break;
         }
+
+        printBoardArray();
         
+    }
+
+    public Piece findKing(int teamColor) {
+        for (int i = 0; i < pieceArray.length; i++) {
+            if(pieceArray[i].getClass().getName().equals("King")) {
+                if(pieceArray[i].getTeamColor() == teamColor)
+                    return pieceArray[i];
+            }
+        }
+        return null;
     }
 
     private boolean isInCheck(Piece piece, boolean updateMessage) {
@@ -256,7 +345,8 @@ public class Board {
                        pieceArray[i].getTeamColor() != (piece.getTeamColor()))
                     {
 
-                            //System.out.println("Check by: " + pieceArray[i] + " at " + pieceArray[i].getCurrentRow() + ", " + pieceArray[i].getCurrentColumn() + " Has a move at " + moves.get(j).getRow() + ", " + moves.get(j).getColumn());
+                            System.out.println("Check by: " + pieceArray[i] + " at " + pieceArray[i].getCurrentRow() + ", " + pieceArray[i].getCurrentColumn() + " Has a move at " + moves.get(j).getRow() + ", " + moves.get(j).getColumn());
+                            System.out.println("Piece that is checked: " + piece);
                             // System.out.println("Piece " + pieceArray[i] + " has moves at: ");
                             // for(RedDot move: moves) {
                             //     System.out.print("(" + move.getRow() + ", " + move.getColumn() + ")");
@@ -373,7 +463,7 @@ public class Board {
         pieceArray[31] = new King(Constants.BLACK, this, 0, 4, initImage("blackKing"));
     }
 
-    public static ImageView initImage(String imageName) {
+    public ImageView initImage(String imageName) {
         try {
             return new ImageView(new Image(new FileInputStream("images\\" + imageName + ".png")));
         } catch (FileNotFoundException e) {
@@ -426,4 +516,7 @@ public class Board {
         return moveList;
     }
 
+    public void setPieceArray(int index, Piece piece) {
+        pieceArray[index] = piece;
+    }
 }

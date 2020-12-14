@@ -66,6 +66,10 @@ public abstract class Piece {
         return -1;
     }
 
+    public ImageView getPieceImage() {
+        return pieceImage;
+    }
+
     public int getTeamColor() {
         return teamColor;
     }

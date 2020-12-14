@@ -9,7 +9,7 @@ public class RedDot {
     private ImageView image;
 
     public RedDot(int row, int column, Board board) {
-        image = Board.initImage("redDot");
+        image = board.initImage("redDot");
         currentRow = row;
         currentColumn = column;
         this.board = board;
