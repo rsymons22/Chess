@@ -4,9 +4,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 /**
  * Main application that contains the start method. Creates the pane, scene, stage, and board.
@@ -43,7 +41,7 @@ public class Chess extends Application {
         primaryStage.setTitle("Chess");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
-        primaryStage.setOnCloseRequest(e -> e.consume());
+        primaryStage.setOnCloseRequest(e -> e.consume()); // Prevents closing normally
         primaryStage.show();
 
         Chess.primaryStage = primaryStage;
